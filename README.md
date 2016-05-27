@@ -1,8 +1,8 @@
 # 版本发布系统
 
-当前版本：v2.0.0 beta
+当前版本：v2.0.0
 
-基于Git的代码发布系统，用于发布PHP等脚本程序。
+基于Git的代码发布系统，用于发布PHP等脚本语言开发的项目。
 
 ### 1. 功能
 
@@ -23,9 +23,14 @@
 
 ### 3. 安装
 
-要求系统为 *nix，并且安装了mysql和git。
+仅支持linux/mac系统，并且要求安装了mysql和git。
 
 安装步骤：
 
 1. 创建数据库，将install.sql导入mysql
-2. 启动 gopub
+2. 使用命令 `./service.sh start` 启动
+3. 使用 `http://localhost:8000` 访问
+
+### 4. 界面截图
+
+![gopub](https://raw.githubusercontent.com/lisijie/gopub/master/screenshot.png)
