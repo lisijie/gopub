@@ -2,7 +2,7 @@
 
 当前版本：v2.0.0
 
-基于Git的代码发布系统，用于发布PHP等脚本语言开发的项目。
+基于Git的代码发布系统，用于发布PHP等脚本语言开发的项目。使用Go语言和Beego框架开发。
 
 ## 功能
 
@@ -23,7 +23,7 @@
 
 ## 下载地址
 
-- v2.0.0 版本： [http://pan.baidu.com/s/1jIMwYSA](http://pan.baidu.com/s/1jIMwYSA "gopub-linux-v2.0.0.zip")
+- v2.0.0 Linux版： [http://pan.baidu.com/s/1jIMwYSA](http://pan.baidu.com/s/1jIMwYSA "gopub-linux-v2.0.0.zip")
 
 ## 安装
 
