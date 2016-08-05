@@ -1,0 +1,47 @@
+
+<div class="row">
+	<div class="col-xs-12">
+	<a href="{{urlfor "AgentController.Add"}}" class="btn btn-sm btn-default"><i class="fa fa-plus"></i> 添加跳板机</a>
+	</div>
+</div>
+
+<div class="space-4"></div>
+
+<div class="row">
+	<div class="col-xs-12">
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th class="col-xs-1">ID</th>
+				<th class="col-xs-2">服务器IP</th>
+				<th>机房</th>
+				<th>SSH端口</th>
+				<th>SSH用户</th>
+				<th>工作目录</th>
+				<th class="col-xs-2">操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .list}}
+				<tr>
+					<td class="center">{{$v.Id}}</td>
+					<td>{{$v.Ip}}</td>
+					<td>{{$v.Area}}</td>
+					<td>{{$v.SshPort}}</td>
+					<td>{{$v.SshUser}}</td>
+					<td>{{$v.WorkDir}}</td>
+					<td>
+					<a href="{{urlfor "AgentController.Projects" "id" $v.Id}}">项目列表</a> | 
+					<a href="{{urlfor "AgentController.Edit" "id" $v.Id}}">编辑</a> | 
+					<a href="{{urlfor "AgentController.Del" "id" $v.Id}}" class="delete_confirm">删除</a>
+					</td>
+				</tr>
+			{{end}}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-12">{{str2html .pageBar}}</div>
+</div>

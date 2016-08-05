@@ -1,0 +1,95 @@
+
+		<div class="row">
+			<div class="col-xs-12">
+			<a href="{{urlfor "ProjectController.Add"}}" class="btn btn-sm btn-default"><i class="fa fa-plus"></i> 添加项目</a>
+			</div>
+		</div>
+
+		<div class="space-4"></div>
+
+		<div class="row">
+			<div class="col-xs-12">
+				<table class="table table-striped table-bordered table-hover">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>项目名称</th>
+						<th>项目标识</th>
+						<th>仓库地址</th>
+						<th>最后发布版本</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{{range $k, $v := .list}}
+						<tr>
+							<td class="center">{{$v.Id}}</td>
+							<td>{{$v.Name}}</td>
+							<td>{{$v.Domain}}</td>
+							<td>{{$v.RepoUrl}}</td>
+							<td>{{$v.Version}}</td>
+							<td class="clone_status" id="status-{{$v.Id}}" data-status="{{$v.Status}}" data-id="{{$v.Id}}">
+							{{if eq $v.Status 1}}
+							<span class="text-success bigger-110 green">已克隆</span>
+							{{end}}
+							{{if eq $v.Status -1}}
+							<span class="text-warning bigger-110 orange">失败</span>，<a href="javascript:clone({{$v.Id}});">重新克隆</a>
+							{{end}}
+							</td>
+							<td>
+							<a href="{{urlfor "EnvController.List" "project_id" $v.Id}}">发布环境</a> | 
+							<a href="{{urlfor "ProjectController.Edit" "id" $v.Id}}">修改项目</a> |
+							<a href="{{urlfor "ProjectController.Del" "id" $v.Id}}" class="delete_confirm">删除项目</a>
+							</td>
+						</tr>
+					{{end}}
+					
+					{{if eq .count 0}}
+						<tr>
+							<td colspan="20">暂无记录...</td>
+						</tr>
+					{{end}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-xs-12">{{str2html .pageBar}}</div>
+		</div>
+
+<script>
+$(function() {
+	$('.clone_status').each(function () {
+		if ($(this).data('status') == 0) {
+			$(this).html('<i class="ace-icon fa fa-spinner fa-spin orange bigger-125"></i> 正在克隆...</span>');
+			get_status($(this).data('id'));
+		}
+	});
+});
+
+function get_status(pid) {
+	$.getJSON("{{urlfor "ProjectController.GetStatus"}}", {id: pid}, function (out) {
+		if (out.status == 0) {
+			setTimeout("get_status("+pid+")", 1000);
+		} else if (out.status == -1) {
+			$('#status-' + pid).html('<span class="text-warning bigger-110 orange">失败</span>，<a href="javascript:clone('+pid+');">重新克隆</a>');
+		} else {
+			$('#status-' + pid).html('<span class="text-success bigger-110 green">已克隆</span>');
+		}
+	});
+}
+
+function clone(pid) {
+	$.getJSON("{{urlfor "ProjectController.Clone"}}", {id: pid}, function (out) {
+		if (out.status == MSG_ERR) {
+			alert(out.msg);
+		} else {
+			$('#status-' + pid).html('<i class="ace-icon fa fa-spinner fa-spin orange bigger-125"></i> 正在克隆...</span>');
+			get_status(pid);
+		}
+	});
+	return false;
+}
+</script>

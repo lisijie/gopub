@@ -1,0 +1,122 @@
+
+<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+
+<form class="form-horizontal ajax-form" method="post" action="{{urlfor "UserController.Edit"}}">
+	<input type="hidden" name="id" value="{{.user.Id}}" />
+	<div class="form-group">
+		<label for="username" class="col-sm-2 control-label">用户名</label>
+		<div class="col-sm-3">
+			<label class="control-label">{{.user.UserName}}</label>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="role_ids" class="col-sm-2 control-label">角色</label>
+		<div class="col-sm-4">
+			<select multiple="" name="role_ids" class="chosen-select form-control" id="role_ids" data-placeholder="选择角色...">
+				{{range $k,$v := .roleList}}
+				<option value="{{$v.Id}}" {{map_get $.chkmap $v.Id}}>{{$v.RoleName}}</option>
+				{{end}}
+			</select>
+
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="sex" class="col-sm-2 control-label">性别</label>
+		<div class="col-sm-4">
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="sex" id="sex" value="1" {{.sex1}}>
+					男
+				</label>
+			</div>
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="sex" id="sex" value="2" {{.sex2}}>
+					女
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="email" class="col-sm-2 control-label">Email</label>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="email" name="email" value="{{.user.Email}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="password1" class="col-sm-2 control-label">新密码</label>
+		<div class="col-sm-4">
+			<input type="password" class="form-control" id="password1" name="password1" value="{{.flash.password1}}">
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline">
+			不修改密码请留空
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="password2" class="col-sm-2 control-label">确认密码</label>
+		<div class="col-sm-4">
+			<input type="password" class="form-control" id="password2" name="password2" value="{{.flash.password2}}">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="status" class="col-sm-2 control-label">状态</label>
+		<div class="col-sm-4">
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="status" id="status" value="0" {{if eq .user.Status 0}}checked{{end}}>
+					正常
+				</label>
+			</div>
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="status" id="status" value="-1" {{if eq .user.Status -1}}checked{{end}}>
+					禁用
+				</label>
+			</div>
+		</div>
+	</div>
+	
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<a href="{{urlfor "UserController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+		</div>
+	</div>
+</form>
+
+<script>
+$(function () {
+	if(!ace.vars['touch']) {
+		$('.chosen-select').chosen({allow_single_deselect:true}); 
+		//resize the chosen on window resize
+	
+		$(window)
+		.off('resize.chosen')
+		.on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				 var $this = $(this);
+				 $this.next().css({'width': $this.parent().width()});
+			})
+		}).trigger('resize.chosen');
+		//resize chosen on sidebar collapse/expand
+		$(document).on('settings.ace.chosen', function(e, event_name, event_val) {
+			if(event_name != 'sidebar_collapsed') return;
+			$('.chosen-select').each(function() {
+				 var $this = $(this);
+				 $this.next().css({'width': $this.parent().width()});
+			})
+		});
+	
+		$('#chosen-multiple-style .btn').on('click', function(e){
+			var target = $(this).find('input[type=radio]');
+			var which = parseInt(target.val());
+			if(which == 2) $('#role_ids').addClass('tag-input-style');
+			 else $('#role_ids').removeClass('tag-input-style');
+		});
+	}
+});
+</script>

@@ -1,0 +1,52 @@
+<div class="row">
+	<div class="col-xs-12">
+	<ul class="steps">
+		<li data-step="1" class="complete">
+			<span class="step">1</span>
+			<span class="title">确认发布文件</span>
+		</li>
+
+		<li data-step="2" class="complete">
+			<span class="step">2</span>
+			<span class="title">发布到目标服务器</span>
+		</li>
+
+		<li data-step="3" class="complete">
+			<span class="step">3</span>
+			<span class="title">发布完成</span>
+		</li>
+	</ul>
+	</div>
+</div>
+<hr >
+
+<div class="row">
+	<div class="col-xs-12">
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>服务器IP</th>
+				<th>机房</th>
+				<th>说明</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .serverList}}
+				<tr>
+					<td>{{$v.Ip}}</td>
+					<td>{{$v.Area}}</td>
+					<td>{{$v.Description}}</td>
+				</tr>
+			{{end}}
+			</tbody>
+		</table>
+		
+		{{if eq .task.PubStatus 3}}
+		<h5>发布日志：</h5>
+		<pre>{{.task.PubLog}}</pre>
+		<p class="text-center">
+		<a href="{{urlfor "TaskController.List" "status" 1}}" class="btn btn-default">返回列表</a>
+		</p>		
+		{{end}}
+	</div>
+</div>

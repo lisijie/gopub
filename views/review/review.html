@@ -1,0 +1,81 @@
+<div class="row">
+	<div class="col-sm-12">
+	
+	<h4 class="header smaller lighter blue">任务信息</h4>
+	<div class="profile-user-info profile-user-info-striped">
+		<div class="profile-info-row">
+			<div class="profile-info-name">任务ID：</div>
+			<div class="profile-info-value">{{.task.Id}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布项目：</div>
+			<div class="profile-info-value">{{.task.ProjectInfo.Name}} （{{.task.ProjectInfo.Domain}}）</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布版本：</div>
+			<div class="profile-info-value">{{if ne .task.StartVer ""}} {{.task.StartVer}} - {{end}}{{.task.EndVer}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布环境：</div>
+			<div class="profile-info-value">{{.env.Name}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布包路径：</div>
+			<div class="profile-info-value">
+			{{.task.Filepath}}
+			</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">创建时间：</div>
+			<div class="profile-info-value">
+			{{date .task.CreateTime "Y-m-d H:i:s"}}
+			</div>
+		</div>
+	</div>
+	
+	<h4 class="header smaller lighter blue">版本说明</h4>
+	<div class="well">{{str2html .task.Message}}</div>
+	
+	<!--		
+	<h4 class="header smaller lighter blue">修改日志</h4>
+	{{if eq .task.StartVer ""}}
+	<pre>该版本为全量版本</pre>
+	{{else}}
+	<pre>{{.task.ChangeLogs}}</pre>
+	{{end}}
+			
+	<h4 class="header smaller lighter blue">修改文件</h4>
+	{{if eq .task.StartVer ""}}
+	<pre>该版本为全量版本</pre>
+	{{else}}
+	<pre>{{.task.ChangeFiles}}</pre>
+	{{end}}
+	-->
+	<h4 class="header smaller lighter blue">发布审批</h4>
+	
+	<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+	<form class="form-horizontal ajax-form" method="post" action="{{urlfor "ReviewController.Review"}}">
+		<input type="hidden" name="id" value="{{.task.Id}}" />
+		<p><textarea name="message" class="form-control" rows="3" placeholder="审批说明"></textarea></p>
+		
+		<div class="radio">
+			<label>
+				<input name="status" type="radio" value="1" class="ace">
+				<span class="lbl"> 审批通过，同意发布</span>
+			</label>
+			<label>
+				<input name="status" type="radio" value="-1" class="ace">
+				<span class="lbl"> 审批不通过，取消发布</span>
+			</label>
+		</div>
+		
+		<div class="clearfix form-actions">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+				<a href="{{urlfor "ReviewController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+			</div>
+		</div>	
+	</form>
+	
+	</div>
+</div>

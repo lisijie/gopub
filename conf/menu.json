@@ -1,0 +1,68 @@
+[
+	{
+		"name": "发布管理",
+		"icon": "fa-cloud-upload",
+		"route": "#",
+		"submenu": [
+			{
+				"name": "新建发布单",
+				"route": "task.create",
+				"action": "TaskController.Create"
+			},
+			{
+				"name": "发布单列表",
+				"route": "task.list",
+				"action": "TaskController.List"
+			},
+			{
+				"name": "发布单审批",
+				"route": "review.list",
+				"action": "ReviewController.List"
+			}
+		]
+	}, 
+	{
+		"name": "项目管理",
+		"icon": "fa-bars",
+		"route": "#",
+		"submenu": [
+			{
+				"name": "项目管理",
+				"route": "project.list",
+				"action": "ProjectController.List"
+			},
+			{
+				"name": "服务器管理",
+				"route": "server.list",
+				"action": "ServerController.List"
+			},
+			{
+				"name": "跳板机管理",
+				"route": "agent.list",
+				"action": "AgentController.List"
+			}
+		]
+	}, 
+	{
+		"name": "系统管理",
+		"icon": "fa-cog",
+		"route": "#",
+		"submenu": [
+			{
+				"name": "角色管理",
+				"route": "role.list",
+				"action": "RoleController.List"
+			},
+			{
+				"name": "邮件模板",
+				"route": "mailtpl.list",
+				"action": "MailTplController.List"
+			},
+			{
+				"name": "用户管理",
+				"route": "user.list",
+				"action": "UserController.List"
+			}
+		]
+	}
+]

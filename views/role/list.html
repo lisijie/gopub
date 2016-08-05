@@ -1,0 +1,42 @@
+<div class="row">
+	<div class="col-xs-12">
+	<a href="{{urlfor "RoleController.Add"}}" class="btn btn-sm btn-default"><i class="fa fa-plus"></i> 创建角色</a>
+	</div>
+</div>
+		
+<div class="space-4"></div>
+
+<div class="row">
+	<div class="col-xs-12">
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th width="50">ID</th>
+				<th width="100">角色名称</th>
+				<th>描述</th>
+				<th>用户列表</th>
+				<th width="150">操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .list}}
+				<tr>
+					<td class="center">{{$v.Id}}</td>
+					<td>{{$v.RoleName}}</td>
+					<td>{{$v.Description}}</td>
+					<td>
+					{{range $kk, $u := $v.UserList}}
+						{{$u.UserName}}
+					{{end}}
+					</td>
+					<td>
+					<a href="{{urlfor "RoleController.Perm" "id" $v.Id}}">权限</a> |
+					<a href="{{urlfor "RoleController.Edit" "id" $v.Id}}">编辑</a> |
+					<a href="{{urlfor "RoleController.Del" "id" $v.Id}}" class="delete_confirm">删除</a> 
+					</td>
+				</tr>
+			{{end}}
+			</tbody>
+		</table>
+	</div>
+</div>

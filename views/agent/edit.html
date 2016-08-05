@@ -1,0 +1,66 @@
+
+<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+
+<form class="form-horizontal ajax-form" method="post" action="{{urlfor "AgentController.Edit"}}">
+	<input type="hidden" name="id" value="{{.server.Id}}" />
+	<div class="form-group">
+		<label for="server_ip" class="col-sm-2 control-label">服务器IP</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="server_ip" name="server_ip" value="{{.server.Ip}}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="area" class="col-sm-2 control-label">机房标识</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="area" name="area" value="{{.server.Area}}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="ssh_port" class="col-sm-2 control-label">SSH端口</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="ssh_port" name="ssh_port" value="{{.server.SshPort}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="ssh_user" class="col-sm-2 control-label">SSH用户名</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="ssh_user" name="ssh_user" value="{{.server.SshUser}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="ssh_pwd" class="col-sm-2 control-label">SSH登录密码</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="ssh_pwd" name="ssh_pwd" value="{{.server.SshPwd}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="ssh_key" class="col-sm-2 control-label">SSH私钥路径</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="ssh_key" name="ssh_key" value="{{.server.SshKey}}">
+		</div>
+		<div class="help-block col-sm-8 col-sm-reset inline">密钥位于本地发布系统的路径</div>
+	</div>
+	<div class="form-group">
+		<label for="work_dir" class="col-sm-2 control-label">工作目录</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="work_dir" name="work_dir" value="{{.server.WorkDir}}">
+		</div>
+		<div class="help-block col-sm-8 col-sm-reset inline">用于存放发布任务代码的目录，如 /home/www/projects</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="description" class="col-sm-2 control-label">服务器说明</label>
+		<div class="col-sm-6">
+			<textarea name="description" id="description" class="form-control" rows="6">{{.server.Description}}</textarea>					
+		</div>
+	</div>
+
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<a href="{{urlfor "AgentController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+		</div>
+	</div>
+</form>

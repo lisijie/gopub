@@ -1,0 +1,85 @@
+<div class="row">
+	<div class="col-xs-12">
+	<ul class="steps">
+		<li data-step="1" class="active">
+			<span class="step">1</span>
+			<span class="title">确认发布文件</span>
+		</li>
+
+		<li data-step="2">
+			<span class="step">2</span>
+			<span class="title">发布到目标服务器</span>
+		</li>
+
+		<li data-step="3">
+			<span class="step">3</span>
+			<span class="title">发布完成</span>
+		</li>
+	</ul>
+	</div>
+</div>
+<hr >
+
+<div class="row">
+	<div class="col-xs-12">
+		
+		<h4 class="header smaller lighter blue">任务信息</h4>
+		<div class="profile-user-info profile-user-info-striped">
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布项目：</div>
+				<div class="profile-info-value">{{.task.ProjectInfo.Name}} （{{.task.ProjectInfo.Domain}}）</div>
+			</div>
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布版本：</div>
+				<div class="profile-info-value">{{if ne .task.StartVer ""}} {{.task.StartVer}} - {{end}}{{.task.EndVer}}</div>
+			</div>
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布包：</div>
+				<div class="profile-info-value">{{.task.Filepath}}</div>
+			</div>
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布环境：</div>
+				<div class="profile-info-value">{{.env.Name}}</div>
+			</div>
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布服务器：</div>
+				<div class="profile-info-value">
+				<ul class="list-inline">
+				{{range $k, $v := .serverList}}
+					<li>{{$v.Ip}}</li>
+				{{end}}
+				</ul>
+				</div>
+			</div>
+			<div class="profile-info-row">
+				<div class="profile-info-name">发布目录：</div>
+				<div class="profile-info-value">{{.env.PubDir}}</div>
+			</div>
+		</div>
+		
+		<h4 class="header smaller lighter blue">更新文件（{{.task.GetChangeFileStat}}）</h4>
+		{{if eq .task.StartVer ""}}
+		<pre>该版本为全量版本</pre>
+		{{else}}
+		<pre>{{.task.ChangeFiles}}</pre>
+		{{end}}
+		
+		<div class="clearfix form-actions">
+			<div class="col-md-5 text-right">
+				<div class="checkbox">
+					<label>
+						<input name="form-field-checkbox" id="chk-confirm" type="checkbox" class="ace" onclick="javascript:$('#btn-confirm').attr('disabled', !$('#chk-confirm').prop('checked'));">
+						<span class="lbl" for="chk-confirm">我已确认</span>
+					</label>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<a href="{{urlfor "TaskController.Publish" "id" .task.Id "step" 2}}" class="btn btn-success" id="btn-confirm" disabled>
+					下一步 <i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+

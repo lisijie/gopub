@@ -1,0 +1,103 @@
+<div class="row">
+	<div class="col-xs-12">
+	<ul class="steps">
+		<li data-step="1" class="complete">
+			<span class="step">1</span>
+			<span class="title">确认发布文件</span>
+		</li>
+
+		<li data-step="2" class="active">
+			<span class="step">2</span>
+			<span class="title">发布到目标服务器</span>
+		</li>
+
+		<li data-step="3">
+			<span class="step">3</span>
+			<span class="title">发布完成</span>
+		</li>
+	</ul>
+	</div>
+</div>
+<hr >
+
+<div class="row">
+	<div class="col-xs-12">
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>服务器IP</th>
+				<th>机房</th>
+				<th>说明</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .serverList}}
+				<tr>
+					<td>{{$v.Ip}}</td>
+					<td>{{$v.Area}}</td>
+					<td>{{$v.Description}}</td>
+				</tr>
+			{{end}}
+			</tbody>
+		</table>
+		
+		<div class="clearfix form-actions">
+			<div class="col-md-5 text-right">
+				<div class="checkbox">
+					<label>
+						<input name="form-field-checkbox" id="chk-confirm" type="checkbox" class="ace" onclick="javascript:$('#start-pub').attr('disabled', !$('#chk-confirm').prop('checked'));">
+						<span class="lbl" for="chk-confirm">我已了解发版风险和注意事项</span>
+					</label>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<button class="btn btn-info" id="start-pub" type="button" disabled>
+					<i class="ace-icon fa fa-cloud-upload bigger-110"></i>
+					开始发布
+				</button>
+				&nbsp;&nbsp;
+				<a href="{{urlfor "TaskController.List"}}">返回列表</a>
+			</div>
+		</div>
+		
+		<div class="hide" id="pub-log">
+		<h5>错误信息：</h5>
+		<pre></pre>
+		</div>
+		
+	</div>
+</div>
+
+<script>
+$(function() {
+	$('#start-pub').click(function() {
+		$('#start-pub, #chk-confirm').attr("disabled", true)
+		$('#start-pub').html('<i class="ace-icon fa fa-spinner fa-spin bigger-125"></i> 正在发布...');
+		$.getJSON("{{urlfor "TaskController.StartPub"}}", {id:{{.task.Id}}}, function(out) {
+			if (out.status == 0) {
+				get_status({{.task.Id}});
+			} else {
+				$('#start-pub, #chk-confirm').attr("disabled", false)
+				$('#start-pub').html('<i class="ace-icon fa fa-spinner fa-spin bigger-125"></i> ' + out.msg);
+				get_status({{.task.Id}});
+			}
+		});
+	});
+
+});
+
+function get_status(id) {
+	$.getJSON("{{urlfor "TaskController.GetStatus"}}", {id: id, type:"pub"}, function (out) {
+		if (out.status < 0) {
+			$('#start-pub').html('<i class="ace-icon fa fa-times bigger-110"></i> 发布失败');
+			$('#pub-log').removeClass('hide');
+			$('#pub-log > pre').html(out.msg);
+		} else if (out.status >= 0 && out.status < 3) {
+			setTimeout("get_status("+id+")", 1000);
+		} else if (out.status == 3) {
+			window.location.reload();
+		}
+	});
+}
+
+</script>

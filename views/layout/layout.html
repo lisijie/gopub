@@ -1,0 +1,52 @@
+{{.Header}}
+
+{{.Navbar}}
+
+	<div class="main-container" id="main-container">
+		<script type="text/javascript">
+			try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+		</script>
+
+		<!--左侧菜单-->
+		{{.Sidebar}}
+		<!--/左侧菜单-->
+
+		<!--页面主体-->
+		<div class="main-content">
+		<div class="main-content-inner">
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript">
+				try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+			</script>
+
+			<ul class="breadcrumb">
+				<li>
+					<i class="ace-icon fa fa-home home-icon"></i>
+					<a href="/">首页</a>
+				</li>
+				<li class="active">{{.pageTitle}}</li>
+			</ul><!-- /.breadcrumb -->
+
+		</div>
+
+		<div class="page-content">
+		<div class="row">
+		<div class="col-xs-12">
+		
+		{{.LayoutContent}}
+		
+		</div>
+		</div>
+		
+		</div><!-- /.page-content -->
+		</div>
+		</div>
+		<!-- /.main-content -->
+		<!--/页面主体-->
+
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+	</div><!-- /.main-container -->
+
+{{.Footer}}

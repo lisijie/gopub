@@ -1,0 +1,74 @@
+
+<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+
+<form class="form-horizontal ajax-form" method="post" action="{{urlfor "RoleController.Perm"}}">
+	<input type="hidden" name="id" value="{{.role.Id}}" />
+	<div class="form-group">
+		<label class="col-sm-2 control-label">角色名</label>
+		<div class="col-sm-10">
+			<label class="control-label">{{.role.RoleName}}</label>
+		</div>
+	</div>
+	
+<!--	<div class="hr hr-16 hr-dotted"></div>
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label">项目权限</label>
+		<div class="col-sm-10">
+			<div class="checkbox-inline">
+				<label>
+				<input type="checkbox" name="all" value="1" data-mod="pids">
+				<span class="lbl">所有项目</span>
+				</label>
+			</div>
+			<br />
+			{{range $k, $p := .projectList}}
+				<div class="checkbox-inline mod-pids">
+					<label>
+					<input type="checkbox" name="pids" value="{{$p.Id}}" {{map_get $.chkmap $p.Id}}>
+					<span class="lbl">{{$p.Name}}</span>
+					</label>
+				</div>
+			{{end}}	
+		</div>
+	</div>-->
+	
+	<div class="hr hr-16 hr-dotted"></div>
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label">访问权限</label>
+		<div class="col-sm-10">
+			{{range $key, $list := .permList}}
+				<div><label class="control-label bolder blue">{{i18n $.lang $key}} <input type="checkbox" name="all" value="1" data-mod="{{$key}}"></label></div>
+				{{range $k, $perm := $list}}
+				<div class="checkbox-inline mod-{{$perm.Module}}">
+					<label>
+					<input type="checkbox" name="perms" value="{{$perm.Key}}" {{map_get $.chkmap $perm.Key}}>
+					<span class="lbl">{{i18n $.lang $perm.Key}}</span>
+					</label>
+				</div>
+				{{end}}
+			{{end}}
+		</div>
+	</div>
+
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<a href="{{urlfor "UserController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+		</div>
+	</div>
+</form>
+
+<script>
+$(function() {
+	$("input[name='all']").click(function () {
+		var mod = $(this).data('mod');
+		if ($(this).prop('checked')) {
+			$(".mod-" + mod + " input[type=checkbox]").prop("checked", true);
+		} else {
+			$(".mod-" + mod + " input[type=checkbox]").prop("checked", false);
+		}
+	});
+});
+</script>

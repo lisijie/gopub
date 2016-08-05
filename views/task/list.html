@@ -1,0 +1,157 @@
+
+<div class="space-4"></div>
+								
+<div class="row">
+	<div class="col-xs-12">
+	
+	<div class="tabbable">
+		<ul class="nav nav-tabs" id="list-tab">
+			<li {{if eq .status 0}}class="active"{{end}}>
+				<a href="{{urlfor "TaskController.List" "status" 0}}">未发布</a>
+			</li>
+			<li {{if eq .status 1}}class="active"{{end}}>
+				<a href="{{urlfor "TaskController.List" "status" 1}}">已发布</a>
+			</li>
+		</ul>
+	
+		<div class="tab-content">
+		
+		<div class="row">
+			<div class="col-xs-12">
+				<form class="form-inline" method="post" action="{{urlfor "TaskController.List"}}">
+				<input type="hidden" name="status" value="{{.status}}" />
+					<div class="input-group input-group-sm">
+						<input type="text" id="start_date" name="start_date" value="{{.startDate}}" class="form-control" />
+						<span class="input-group-addon">
+							<i class="ace-icon fa fa-calendar"></i>
+						</span>
+					</div>
+					<div class="input-group input-group-sm">
+						<input type="text" id="end_date" name="end_date" value="{{.endDate}}" class="form-control" />
+					<span class="input-group-addon">
+						<i class="ace-icon fa fa-calendar"></i>
+					</span>
+					</div>
+					<div class="input-group input-group-sm">
+						<select name="project_id">
+							<option value="">所有项目</option>
+							{{range $k,$v := .projectList}}
+							<option value="{{$v.Id}}" {{if eq $.projectId $v.Id}}selected{{end}}>{{$v.Name}} ({{$v.Domain}})</option>
+							{{end}}
+						</select>
+					</div>
+					<div class="input-group input-group-sm">
+						<button type="submit" class="btn">查询</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="space-4"></div>
+
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>单号</th>
+				<th class="col-xs-2">项目名称</th>
+				<th>发布版本</th>
+				<th>提单人</th>
+				<th>创建时间</th>
+				<th>构建状态</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .list}}
+				<tr>
+					<td class="center"><a href="{{urlfor "TaskController.Detail" "id" $v.Id}}">{{$v.Id}}</a></td>
+					<td>{{$v.ProjectInfo.Name}}</td>
+					<td>
+					{{if ne $v.StartVer ""}}
+					{{$v.StartVer}} - 
+					{{end}}
+					{{$v.EndVer}}
+					</td>
+					<td>{{$v.UserName}}</td>
+					<td>{{date $v.CreateTime "Y-m-d H:i:s"}}</td>
+					<td class="build_status col-sm-1" id="status-{{$v.Id}}" data-status="{{$v.BuildStatus}}" data-id="{{$v.Id}}">
+					{{if eq $v.BuildStatus 1}}
+					<i class="ace-icon fa fa-check bigger-110 green"></i>
+					{{end}}
+					{{if eq $v.BuildStatus -1}}
+					<i class="ace-icon fa fa-times bigger-110 red" title="{{$v.ErrorMsg}}"></i>
+					{{end}}
+					</td>
+					<td>
+					{{if eq $v.ReviewStatus 0}}
+						<b class="orange">等待审批</b>
+					{{else if eq $v.ReviewStatus -1}}
+						<b class="red">审批不通过</b>
+					{{else}}
+						{{if eq $v.PubStatus 0}}
+						 <b class="green">等待发布</b>
+						{{end}}
+						{{if eq $v.PubStatus 1}}
+						 正在发布
+						{{end}}
+						{{if eq $v.PubStatus -2}}
+						 发布失败
+						{{end}}
+						{{if eq $v.PubStatus -3}}
+						 发布失败
+						{{end}}
+						{{if eq $v.PubStatus 3}}
+						<b class="green">已发布</b>				
+						{{end}}
+					{{end}}
+					</td>
+					<td>
+					<a href="{{urlfor "TaskController.Detail" "id" $v.Id}}" class="btn btn-minier btn-info">版本详情</a>
+					
+					<a href="{{urlfor "TaskController.Publish" "id" $v.Id}}" class="btn btn-minier btn-success build-status{{$v.BuildStatus}}" {{if ne $v.ReviewStatus 1}}disabled{{end}}>发布版本</a>
+					
+					<a href="{{urlfor "TaskController.Del" "id" $v.Id}}" class="delete_confirm btn btn-minier btn-danger">删除发布单</a>
+				</tr>
+			{{end}}
+			
+			{{if eq .count 0}}
+				<tr>
+					<td colspan="20">暂无记录...</td>
+				</tr>
+			{{end}}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="10">{{str2html .pageBar}}</td>
+				</tr>
+			</tfoot>
+		</table>
+		</div>
+	</div>
+	</div>
+</div>
+
+<script>
+$(function() {
+	$('.build-status-1').attr('disabled', true);
+	$('.build_status').each(function () {
+		if ($(this).data('status') == 0) {
+			$(this).html('<i class="ace-icon fa fa-spinner fa-spin orange bigger-125"></i> 构建中...</span>');
+			get_status($(this).data('id'));
+		}
+	});
+});
+
+function get_status(task_id) {
+	$.getJSON("{{urlfor "TaskController.GetStatus"}}", {id: task_id}, function (out) {
+		if (out.status == 0) {
+			setTimeout("get_status("+task_id+")", 1000);
+		} else if (out.status == -1) {
+			$('#status-' + task_id).html('<i class="ace-icon fa fa-times bigger-110 red"></i>');
+			alert('构建失败：' + out.msg);
+		} else {
+			$('#status-' + task_id).html('<i class="ace-icon fa fa-check bigger-110 green"></i>');
+		}
+	});
+}
+</script>

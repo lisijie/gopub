@@ -1,0 +1,283 @@
+<div class="row">
+	<div class="space-6"></div>
+
+	<div class="col-sm-12 infobox-container">
+		<div class="infobox infobox-pink">
+			<div class="infobox-icon">
+				<i class="ace-icon fa fa-desktop"></i>
+			</div>
+			<div class="infobox-data">
+				<span class="infobox-data-number">{{.serverNum}}</span>
+				<div class="infobox-content">台服务器</div>
+			</div>
+		</div>
+		
+		<div class="infobox infobox-green">
+			<div class="infobox-icon">
+				<i class="ace-icon fa fa-globe"></i>
+			</div>
+			<div class="infobox-data">
+				<span class="infobox-data-number">{{.projectNum}}</span>
+				<div class="infobox-content">个项目</div>
+			</div>
+		</div>
+		
+		<div class="infobox infobox-red">
+			<div class="infobox-icon">
+				<i class="ace-icon fa fa-users"></i>
+			</div>
+
+			<div class="infobox-data">
+				<span class="infobox-data-number">{{.userNum}}</span>
+				<div class="infobox-content">位用户</div>
+			</div>
+		</div>
+
+		<div class="infobox infobox-blue">
+			<div class="infobox-icon">
+				<i class="ace-icon fa fa-bar-chart-o"></i>
+			</div>
+
+			<div class="infobox-data">
+				<span class="infobox-data-number">{{.pubNum}}</span>
+				<div class="infobox-content">次发布</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="hr"></div>
+
+<div class="row">
+	<div class="col-xs-6">
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-flat">
+				<h4 class="widget-title lighter">
+					<i class="ace-icon fa fa-signal orange"></i>
+					发版统计
+				</h4>
+				<div class="widget-toolbar no-border">
+					<div class="inline dropdown-hover">
+						<button class="btn btn-minier">
+							本月
+							<i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>
+						</button>
+						<ul id="range" class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">
+							<li class="active">
+								<a href="this_month" class="blue">
+									<i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>本月
+								</a>
+							</li>
+							<li>
+								<a href="last_month">
+									<i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>上月
+								</a>
+							</li>
+							<li>
+								<a href="this_year">
+									<i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>今年
+								</a>
+							</li>
+							<li>
+								<a href="last_year">
+									<i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>去年
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="widget-body">
+				<div class="widget-main padding-4">
+					<div id="chart-sale"></div>
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div><!-- /.widget-box -->
+	</div>
+	
+	<div class="col-xs-6">
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-flat">
+				<h4 class="widget-title lighter">
+					<i class="ace-icon fa fa-star orange"></i>
+					活跃项目
+				</h4>
+			</div>
+
+			<div class="widget-body">
+				<div class="widget-main no-padding">
+					<table class="table table-bordered table-striped">
+						<thead class="thin-border-bottom">
+							<tr>
+								<th>
+									<i class="ace-icon fa fa-caret-right blue"></i>项目
+								</th>
+
+								<th>
+									<i class="ace-icon fa fa-caret-right blue"></i>发版总数
+								</th>
+
+								<th class="hidden-480">
+									<i class="ace-icon fa fa-caret-right blue"></i>当前版本
+								</th>
+							</tr>
+						</thead>
+
+						<tbody>
+						{{range $k, $v := .popProjects}}
+							<tr>
+								<td>{{$v.project_name}}</td>
+								<td>
+									<b class="green">{{$v.count}}</b>
+								</td>
+								<td class="hidden-480">
+									{{$v.version}} ({{$v.version_time}})
+								</td>
+							</tr>
+						{{end}}
+						</tbody>
+					</table>
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div>
+	</div>
+</div>
+
+<div class="hr hr32 hr-dotted"></div>
+
+<div class="row">
+
+	<div class="col-xs-6">
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-flat">
+				<h4 class="widget-title lighter">
+					<i class="ace-icon fa fa-rss orange"></i>
+					最新动态
+				</h4>
+			</div>
+
+			<div class="widget-body">
+				<div class="widget-main no-padding">
+						{{range $k, $v := .feeds}}
+						<div class="profile-activity clearfix">
+							{{date $v.CreateTime "m-d H:i:s"}}，{{str2html $v.Message}}				
+						</div>
+						{{end}}
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div>
+	</div>
+	
+	<div class="col-xs-6">
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-flat">
+				<h4 class="widget-title lighter">
+					<i class="ace-icon fa fa-info-circle orange"></i>
+					系统信息
+				</h4>
+			</div>
+
+			<div class="widget-body">
+				<div class="widget-main no-padding">
+					<ul class="item-list">
+						<li class="item-orange">
+							程序版本：GoPub v{{.version}}
+						</li>
+
+						<li class="item-red clearfix">
+							主机名称：{{.hostname}}
+						</li>
+
+						<li class="item-default clearfix ui-sortable-handle">
+							数据库版本：MySQL {{.dbVerson}}
+						</li>
+
+						<li class="item-blue clearfix ui-sortable-handle">
+							运行环境：{{.os}} ({{.arch}}), CPU Num: {{.cpuNum}}, {{.gover}}, goroutine: {{.goroutineNum}}
+						</li>
+
+						<li class="item-grey clearfix ui-sortable-handle">
+							数据目录：{{.dataDir}}
+						</li>
+
+						<li class="item-green clearfix ui-sortable-handle">
+							启动时间：{{.uptime}}
+						</li>
+
+						<li class="item-pink clearfix ui-sortable-handle">
+							程序作者：<a href="https://github.com/lisijie" target="_blank">李思杰（Jesse.Li）</a>，特别鸣谢：黄忠信（Muses）
+						</li>
+					</ul>
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div>
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+
+$("<div id='chart_tooltip'></div>").css({
+		position: "absolute",
+		display: "none",
+		border: "1px solid #000",
+		color: "#fff",
+		padding: "2px",
+		"background-color": "#333",
+		opacity: 0.60
+	}).appendTo("body");
+	
+$('#chart-sale').css({'width':'100%' , 'min-height':'230px'});
+
+$('#range a').on('click', function(e) {
+	e.preventDefault();
+	$(this).parent().parent().find('li').removeClass('active');
+	$(this).parent().parent().find('li .blue i').addClass('invisible');
+	$(this).parent().parent().find('li a').removeClass('blue');
+	$(this).parent().addClass('active');
+	$(this).addClass('blue');
+	$(this).find('i').removeClass('invisible');
+	
+	$('#range').parent().find('button').html($(this).text() + '<i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>');
+	
+	$.ajax({
+		type: 'get',
+		url: '/main/getpubstat?range=' + $(this).attr('href'),
+		dataType: 'json',
+		success: function(json) {
+			var option = {
+				bars: {
+					show: true,
+					fill: true,
+					lineWidth: 1
+				},
+				grid: {hoverable: true, clickable: true},
+				yaxis: { ticks: 10, min: 0, tickDecimals:0 },
+				xaxis: {
+					show: true,	
+					ticks: json.ticks
+				}
+			};
+			$.plot('#chart-sale', [{"label":"发版次数","data":json.chart}], option);
+			
+			$('#chart-sale').bind('plothover', function(event, pos, item) {
+				if (item) {
+					var x = option.xaxis.ticks[item.datapoint[0].toFixed(0)-1][2],
+						y = item.datapoint[1].toFixed(0);
+		
+					$("#chart_tooltip").html(x + ', ' + item.series.label + ": " + y)
+						.css({top: item.pageY+5, left: item.pageX+5})
+						.fadeIn(200);
+				} else {
+					$("#chart_tooltip").hide();
+				}
+		
+			});
+		}
+	});
+});
+
+$('#range .active a').trigger('click');
+
+</script>

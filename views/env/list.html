@@ -1,0 +1,42 @@
+
+		<div class="row">
+			<div class="col-xs-12">
+			<a href="{{urlfor "EnvController.Add" "project_id" .projectId}}" class="btn btn-sm btn-default"><i class="fa fa-user"></i> 添加发布环境</a>
+			</div>
+		</div>
+
+		<div class="space-4"></div>
+
+		<div class="row">
+			<div class="col-xs-12">
+				<table class="table table-striped table-bordered table-hover">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>环境名称</th>
+						<th>SSH帐号</th>
+						<th>SSH端口</th>
+						<th>发布目录</th>
+						<th>服务器数量</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{{range $k, $v := .envList}}
+						<tr>
+							<td class="center">{{$v.Id}}</td>
+							<td>{{$v.Name}}</td>
+							<td>{{$v.SshUser}}</td>
+							<td>{{$v.SshPort}}</td>
+							<td>{{$v.PubDir}}</td>
+							<td>{{$v.ServerCount}}</td>
+							<td>
+							<a href="{{urlfor "EnvController.Edit" "id" $v.Id}}">编辑</a> | 
+							<a href="{{urlfor "EnvController.Del" "id" $v.Id}}" class="delete_confirm">删除</a>
+							</td>
+						</tr>
+					{{end}}
+					</tbody>
+				</table>
+			</div>
+		</div>

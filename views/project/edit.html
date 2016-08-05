@@ -1,0 +1,120 @@
+
+<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+
+<form class="form-horizontal ajax-form" method="post" action="{{urlfor "ProjectController.Edit"}}">
+<input type="hidden" name="id" value="{{.project.Id}}" />
+	<div class="form-group">
+		<label for="project_name" class="col-sm-2 control-label">项目名称</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="project_name" name="project_name" value="{{.project.Name}}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="project_domain" class="col-sm-2 control-label">项目标识</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="project_domain" name="project_domain" value="{{.project.Domain}}" disabled>
+		</div>
+		<div class="help-block col-sm-8 col-sm-reset inline">作为本地目录名，一般为项目域名</div>
+	</div>
+
+	<div class="form-group">
+		<label for="repo_url" class="col-sm-2 control-label">仓库地址</label>
+		<div class="col-sm-5">
+		{{if eq .project.Status 1}}
+			<input type="text" class="form-control" id="repo_url" name="repo_url" value="{{.project.RepoUrl}}" disabled>
+		{{else}}
+			<input type="text" class="form-control" id="repo_url" name="repo_url" value="{{.project.RepoUrl}}">
+		{{end}}
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="ignore_list" class="col-sm-2 control-label">忽略文件列表</label>
+		<div class="col-sm-6">
+			<textarea name="ignore_list" id="ignore_list" rows="6" class="form-control">{{.project.IgnoreList}}</textarea>
+		</div>
+	</div>
+	
+	<div class="hr hr-16 hr-dotted"></div>
+	
+	<div class="form-group">
+		<label for="agent_host" class="col-sm-2 control-label">跳板机</label>
+		<div class="col-sm-3">
+			<select name="agent_id">
+				<option value="">请选择</option>
+				{{range $k, $v := .agentList}}
+				<option value="{{$v.Id}}"  {{if eq $.project.AgentId $v.Id}}selected{{end}}>{{$v.Ip}}</option>
+				{{end}}
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="before_shell" class="col-sm-2 control-label">同步前执行脚本</label>
+		<div class="col-sm-6">
+			<textarea name="before_shell" id="before_shell" rows="6" class="form-control" placeholder="发布前在跳板机执行">{{.project.BeforeShell}}</textarea>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="after_shell" class="col-sm-2 control-label">同步后执行脚本</label>
+		<div class="col-sm-6">
+			<textarea name="after_shell" id="after_shell" rows="6" class="form-control" placeholder="发布后在跳板机执行">{{.project.AfterShell}}</textarea>
+		</div>
+	</div>
+
+	<div class="hr hr-16 hr-dotted"></div>
+	
+	<div class="form-group">
+		<label for="create_verfile" class="col-sm-2 control-label">是否生成版本号文件</label>
+		<div class="col-sm-5">
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="create_verfile" value="1" {{if eq .project.CreateVerfile 1}}checked{{end}}>
+					是
+				</label>
+			</div>
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="create_verfile" value="0" {{if eq .project.CreateVerfile 0}}checked{{end}}>
+					否
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="verfile_path" class="col-sm-2 control-label">版本号文件目录</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="verfile_path" name="verfile_path" value="{{.project.VerfilePath}}">
+		</div>
+		<div class="help-block col-sm-8 col-sm-reset inline">系统将在该目录下生成2个文件version.txt和release.txt，内容分别为发布的版本号和发布时间。</div>
+	</div>
+	
+	<div class="hr hr-16 hr-dotted"></div>
+	<div class="form-group">
+		<label for="task_review" class="col-sm-2 control-label">发布单是否需要经过审批</label>
+		<div class="col-sm-5">
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="task_review" value="1" {{if eq .project.TaskReview 1}}checked{{end}} />
+					需要
+				</label>
+			</div>
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="task_review" value="0" {{if eq .project.TaskReview 0}}checked{{end}} />
+					不需要
+				</label>
+			</div>
+		</div>
+	</div>
+	
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<button type="reset" class="btn btn-default"><i class="ace-icon fa fa-refresh bigger-110"></i>重置</button>
+		</div>
+	</div>
+</form>
+

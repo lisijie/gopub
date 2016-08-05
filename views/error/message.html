@@ -1,0 +1,37 @@
+<div class="row">
+	<div class="col-xs-12">
+
+		<div class="error-container">
+			<div class="well">
+				<h1 class="grey lighter smaller">
+					<span class="blue bigger-10">
+						<i class="ace-icon fa fa-exclamation-triangle red bigger-100"></i>
+					</span>
+					出错了！
+				</h1>
+
+				<hr />
+				<h3 class="lighter smaller">{{.msg}}</h3>
+
+				<hr />
+				<div class="space"></div>
+
+				<div class="center">
+					{{if eq .redirect ""}}
+					<a href="javascript:history.back()" class="btn btn-grey">
+						<i class="ace-icon fa fa-arrow-left"></i>
+						返回
+					</a>
+					{{else}}
+					<a href="{{.redirect}}" class="btn btn-grey">
+						<i class="ace-icon fa fa-arrow-left"></i>
+						返回
+					</a>
+					{{end}}
+					
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

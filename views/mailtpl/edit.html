@@ -1,0 +1,133 @@
+<div class="well well-sm">
+<b>模板变量说明：</b><br />
+<ul>
+	<li>{project} 项目名称</li>
+	<li>{domain} 项目标识（域名）</li>
+	<li>{version} 发布版本</li>
+	<li>{env} 发布环境名称</li>
+	<li>{description} 版本说明</li>
+	<li>{changelogs} 版本提交日志列表</li>
+	<li>{changefiles} 修改文件列表</li>
+</ul>
+</div>
+
+<hr />
+<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+
+<form class="form-horizontal" method="post" action="{{urlfor "MailTplController.Edit"}}">
+	<input type="hidden" name="id" value="{{.tpl.Id}}" />
+	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">模板名称</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="name" name="name" value="{{.tpl.Name}}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="subject" class="col-sm-2 control-label">邮件主题</label>
+		<div class="col-sm-8">
+			<input type="text" class="form-control" id="subject" name="subject" value="{{.tpl.Subject}}">
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="mail-content" class="col-sm-2 control-label">邮件内容</label>
+		<div class="col-sm-8">
+			<div class="wysiwyg-editor" id="mail-content">{{str2html .tpl.Content}}</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="mail_to" class="col-sm-2 control-label">预设收件人</label>
+		<div class="col-sm-8">
+			<textarea name="mail_to" id="mail_to" rows="6" class="form-control" placeholder="每行一个邮件地址，使用该模板都会带上这些收件人">{{.tpl.MailTo}}</textarea>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="mail_cc" class="col-sm-2 control-label">预设抄送人</label>
+		<div class="col-sm-8">
+			<textarea name="mail_cc" id="mail_cc" rows="6" class="form-control" placeholder="每行一个邮件地址，使用该模板都会抄送给这些地址">{{.tpl.MailCc}}</textarea>
+		</div>
+	</div>
+
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<a href="{{urlfor "MailTplController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+		</div>
+	</div>
+</form>
+
+<script src="assets/js/jquery.hotkeys.min.js"></script>
+<script src="assets/js/bootstrap-wysiwyg.min.js"></script>
+<script type="text/javascript">
+jQuery(function($){
+	$('#mail-content').ace_wysiwyg({
+		toolbar:
+		[
+			'font',
+			null,
+			'fontSize',
+			null,
+			{name:'bold', className:'btn-info'},
+			{name:'italic', className:'btn-info'},
+			{name:'strikethrough', className:'btn-info'},
+			{name:'underline', className:'btn-info'},
+			null,
+			{name:'insertunorderedlist', className:'btn-success'},
+			{name:'insertorderedlist', className:'btn-success'},
+			{name:'outdent', className:'btn-purple'},
+			{name:'indent', className:'btn-purple'},
+			null,
+			{name:'justifyleft', className:'btn-primary'},
+			{name:'justifycenter', className:'btn-primary'},
+			{name:'justifyright', className:'btn-primary'},
+			{name:'justifyfull', className:'btn-inverse'},
+			null,
+			{name:'createLink', className:'btn-pink'},
+			{name:'unlink', className:'btn-pink'},
+			null,
+			{name:'insertImage', className:'btn-success'},
+			null,
+			'foreColor',
+			null,
+			{name:'undo', className:'btn-grey'},
+			{name:'redo', className:'btn-grey'}
+		]
+	}).prev().addClass('wysiwyg-style2');
+	
+	$('form').on('submit', function() {
+		var url = $('form').attr('action') + "?_t=" + Math.random();
+		$('.alert').addClass('hide');
+		$('button[type="submit"]').attr('disabled', true);
+		var data = {
+			id: $("input[name='id']").val(),
+			name: $("input[name='name']").val(),
+			subject: $("input[name='subject']").val(),
+			content: $("#mail-content").html(),
+			mail_to: $("#mail_to").val(),
+			mail_cc: $("#mail_cc").val()
+		};
+
+		$.post(url, data, function (out) {
+			if (out.status == MSG_OK) { // 成功
+				if (out.redirect != "") {
+					window.location.href = out.redirect;
+				} else {
+					window.location.reload();
+				}
+			} else if (out.status == MSG_REDIRECT) {
+				window.location.href = out.redirect;
+			} else if (out.status == MSG_ERR) {
+				if ($('.alert')) {
+					$('.alert').removeClass('hide');
+					$('.alert').html(out.msg);
+				} else {
+					alert(out.msg);
+				}
+				$('button[type="submit"]').removeAttr('disabled');
+			}
+		});
+		return false;
+	});
+});
+</script>

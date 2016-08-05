@@ -1,0 +1,79 @@
+<div class="row">
+	<div class="col-sm-12">
+	
+	<h4 class="header smaller lighter blue">任务信息</h4>
+	<div class="profile-user-info profile-user-info-striped">
+		<div class="profile-info-row">
+			<div class="profile-info-name">任务ID：</div>
+			<div class="profile-info-value">{{.task.Id}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布项目：</div>
+			<div class="profile-info-value">{{.task.ProjectInfo.Name}} （{{.task.ProjectInfo.Domain}}）</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布版本：</div>
+			<div class="profile-info-value">{{if ne .task.StartVer ""}} {{.task.StartVer}} - {{end}}{{.task.EndVer}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">发布环境：</div>
+			<div class="profile-info-value">{{.env.Name}}</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">构建状态：</div>
+			<div class="profile-info-value">
+			{{if eq .task.BuildStatus 1}}
+			<span class="text-success">成功</span>
+			{{end}}
+			{{if eq .task.BuildStatus -1}}
+			<span class="text-danger">失败（{{.task.ErrorMsg}}）</span>
+			{{end}}
+			</div>
+		</div>
+		<div class="profile-info-row">
+			<div class="profile-info-name">更新包路径：</div>
+			<div class="profile-info-value">
+			{{.task.Filepath}}
+			</div>
+		</div>
+	</div>
+	<h4 class="header smaller lighter blue">版本说明</h4>
+	<div class="well">{{str2html .task.Message}}</div>
+	<h4 
+	class="header smaller lighter blue">修改日志</h4>
+	{{if eq .task.StartVer ""}}
+	<pre>该版本为全量版本</pre>
+	{{else}}
+	<pre class="well">{{.task.ChangeLogs}}</pre>
+	{{end}}
+			
+	<h4 class="header smaller lighter blue">修改文件 （{{.task.GetChangeFileStat}}）</h4>
+	{{if eq .task.StartVer ""}}
+	<pre>该版本为全量版本</pre>
+	{{else}}
+	<pre class="well">{{.task.ChangeFiles}}</pre>
+	{{end}}
+	
+	{{if gt .review.Id 0}}
+	<h4 class="header smaller lighter blue">审批历史</h4>
+	
+	<p><b>审批人：</b>{{.review.UserName}}</p>
+	<p><b>审批时间：</b>{{date .review.CreateTime "Y-m-d H:i:s"}}</p>
+	<p><b>审批结果：</b>
+	{{if eq .review.Status 1}}
+	<b class="green">审批通过</b>
+	{{else if eq .review.Status -1}}
+	<b class="red">审批不通过</b>
+	{{end}}
+	</p>
+	<p><b>审批说明：</b>{{.review.Message}}</p>
+	{{end}}
+	
+	<div class="clearfix form-actions">
+		<div class="col-sm-offset-2 col-sm-10">
+			<a href="{{urlfor "TaskController.List"}}" class="btn btn-default"><i class="ace-icon fa fa-reply bigger-110"></i>返回</a>
+		</div>
+	</div>	
+	
+	</div>
+</div>

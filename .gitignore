@@ -1,0 +1,5 @@
+gopub*
+data/*
+logs/*.log
+build.tar.gz
+*.bak

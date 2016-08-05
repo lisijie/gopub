@@ -1,0 +1,38 @@
+
+<form class="form-horizontal" id="choose" method="get" action="{{urlfor "TaskController.Create"}}">
+	<div class="form-group">
+		<label for="project_name" class="col-sm-2 control-label">选择项目</label>
+		<div class="col-sm-3">
+			<select name="project_id" class="form-control">
+				<option value="">请选择</option>
+				{{range $k, $v := .list}}
+				<option value="{{$v.Id}}">{{$v.Name}} ({{$v.Domain}})</option>
+				{{end}}
+			</select>
+		</div>
+	</div>
+	
+	<div class="hr hr-18 dotted"></div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button class="btn btn-success btn-next" disabled>
+			下一步
+			<i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+			</button>
+		</div>
+	</div>
+</form>
+
+<script>
+$(function() {
+	$(":input[name='project_id']").change(function () {
+		if ($("select option:selected").val() != "") {
+			$(".btn-next").attr('disabled', false);
+		} else {
+			$(".btn-next").attr('disabled', true);
+		}
+	});
+	
+});
+</script>

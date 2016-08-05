@@ -1,0 +1,103 @@
+
+<div class="space-4"></div>
+								
+<div class="row">
+	<div class="col-xs-12">
+	
+	<div class="tabbable">
+		<ul class="nav nav-tabs" id="list-tab">
+			<li {{if eq .status 0}}class="active"{{end}}>
+				<a href="{{urlfor "ReviewController.List" "status" 0}}">待审批</a>
+			</li>
+			<li {{if eq .status 1}}class="active"{{end}}>
+				<a href="{{urlfor "ReviewController.List" "status" 1}}">已审批</a>
+			</li>
+		</ul>
+	
+		<div class="tab-content">
+		
+		<div class="row">
+			<div class="col-xs-12">
+				<form class="form-inline" method="post" action="{{urlfor "ReviewController.List"}}">
+				<input type="hidden" name="status" value="{{.status}}" />
+					<div class="input-group input-group-sm">
+						<input type="text" id="start_date" name="start_date" value="{{.startDate}}" class="form-control" />
+						<span class="input-group-addon">
+							<i class="ace-icon fa fa-calendar"></i>
+						</span>
+					</div>
+					<div class="input-group input-group-sm">
+						<input type="text" id="end_date" name="end_date" value="{{.endDate}}" class="form-control" />
+					<span class="input-group-addon">
+						<i class="ace-icon fa fa-calendar"></i>
+					</span>
+					</div>
+					<div class="input-group input-group-sm">
+						<button type="submit" class="btn">查询</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="space-4"></div>
+
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>单号</th>
+				<th class="col-xs-2">项目名称</th>
+				<th>发布环境</th>
+				<th>发布版本</th>
+				<th>提单人</th>
+				<th>创建时间</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{{range $k, $v := .list}}
+				<tr>
+					<td class="center">{{$v.Id}}</td>
+					<td>{{$v.ProjectInfo.Name}}</td>
+					<td>{{$v.EnvInfo.Name}}</td>
+					<td>
+					{{if ne $v.StartVer ""}}
+					{{$v.StartVer}} - 
+					{{end}}
+					{{$v.EndVer}}
+					</td>
+					<td>{{$v.UserName}}</td>
+					<td>{{date $v.CreateTime "Y-m-d H:i:s"}}</td>					
+					<td>
+					{{if eq $v.ReviewStatus 0}}
+						<b class="orange">等待审批</b>	
+					{{else if eq $v.ReviewStatus -1}}						
+						<b class="red">审批不通过</b>
+					{{else}}
+						<b class="green">审批通过</b>		
+					{{end}}
+					</td>
+					<td>
+					{{if eq $v.ReviewStatus 0}}
+					<a href="{{urlfor "ReviewController.Review" "id" $v.Id}}" class="btn btn-minier btn-info">进入审批</a>
+					{{else}}
+					<a href="{{urlfor "ReviewController.Detail" "id" $v.Id}}" class="btn btn-minier btn-info">浏览详情</a>
+					{{end}}
+				</tr>
+			{{end}}
+			
+			{{if eq .count 0}}
+				<tr>
+					<td colspan="20">暂无记录...</td>
+				</tr>
+			{{end}}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="10">{{str2html .pageBar}}</td>
+				</tr>
+			</tfoot>
+		</table>
+		</div>
+	</div>
+	</div>
+</div>

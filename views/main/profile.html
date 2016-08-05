@@ -1,0 +1,68 @@
+
+{{if .flash.error}}
+<div class="alert alert-danger alert-dismissible fade in" role="alert">
+	{{.flash.error}}
+</div>
+{{end}}
+{{if .flash.success}}
+<div class="alert alert-warning alert-dismissible fade in" role="alert">
+	{{.flash.success}}
+</div>
+<script>$(".alert").fadeOut(2000);</script>
+{{end}}
+
+<form class="form-horizontal" method="post" action="{{urlfor "MainController.Profile"}}">
+	<div class="form-group">
+		<label class="col-sm-2 control-label">用户名</label>
+		<div class="col-sm-10">
+			<label class="control-label">{{.user.UserName}}</label>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="sex" class="col-sm-2 control-label">性别</label>
+		<div class="col-sm-3">
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="sex" id="sex" value="1" {{if eq .user.Sex 1}}checked{{end}}>
+					男
+				</label>
+			</div>
+			<div class="radio-inline">
+				<label>
+					<input type="radio" name="sex" id="sex" value="2" {{if eq .user.Sex 2}}checked{{end}}>
+					女
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="email" class="col-sm-2 control-label">Email</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="email" name="email" value="{{.user.Email}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="password1" class="col-sm-2 control-label">新密码</label>
+		<div class="col-sm-3">
+			<input type="password" class="form-control" id="password1" name="password1" value="" />
+		</div>
+		<div class="help-block col-xs-12 col-sm-reset inline">
+			不修改密码请留空
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="password2" class="col-sm-2 control-label">确认密码</label>
+		<div class="col-sm-3">
+			<input type="password" class="form-control" id="password2" name="password2">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-info"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+			<button type="reset" class="btn btn-default"><i class="ace-icon fa fa-refresh bigger-110"></i>重置</button>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,123 @@
+
+	<div class="alert alert-warning alert-dismissible hide" role="alert"></div>
+		
+	<form class="form-horizontal ajax-form" name="create_task" method="post" action="{{urlfor "TaskController.Create"}}">
+		<input type="hidden" name="project_id" value="{{.projectId}}" />
+		<input type="hidden" name="editor_content" />
+		
+		<div class="form-group">
+			<label for="ver_type" class="col-sm-2 control-label">版本类型</label>
+			<div class="col-sm-3">
+				<div class="radio-inline">
+					<label>
+						<input type="radio" name="ver_type" id="ver_type" value="1" checked>
+						差异版本
+					</label>
+				</div>
+				<div class="radio-inline">
+					<label>
+						<input type="radio" name="ver_type" id="ver_type" value="2">
+						全量版本
+					</label>
+				</div>
+			</div>
+		</div>
+	
+		<div class="form-group" id="group_start_ver">
+			<label for="start_ver" class="col-sm-2 control-label">起始版本</label>
+			<div class="col-sm-3">
+				<select name="start_ver" class="form-control" disabled>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="end_ver" class="col-sm-2 control-label">结束版本</label>
+			<div class="col-sm-3">
+				<select name="end_ver" class="form-control" disabled>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="envId" class="col-sm-2 control-label">发布环境</label>
+			<div class="col-sm-3">
+				{{range $k,$v := .envList}}
+				<label class="inline">
+					<input type="radio" class="ace ace-radio-2" name="envId" value="{{$v.Id}}">
+					<span class="lbl"> {{$v.Name}}</span>
+				</label>
+				&nbsp;&nbsp;
+				{{end}}
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="message" class="col-sm-2 control-label">版本说明</label>
+			<div class="col-sm-9">
+				<div class="wysiwyg-editor" id="editor"></div>				
+			</div>
+		</div>
+
+		<div class="clearfix form-actions">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-info" name="submit"><i class="ace-icon fa fa-check bigger-110"></i>提交</button>
+				<button type="reset" class="btn btn-default"><i class="ace-icon fa fa-refresh bigger-110"></i>重置</button>
+			</div>
+		</div>
+	</form>
+
+<script src="assets/js/jquery.hotkeys.min.js"></script>
+<script src="assets/js/bootstrap-wysiwyg.min.js"></script>
+<script type="text/javascript">
+jQuery(function($){
+	$('#editor').ace_wysiwyg({
+		toolbar:
+		[
+			'font',
+			null,
+			'fontSize',
+			null,
+			{name:'bold', className:'btn-info'},
+			{name:'italic', className:'btn-info'},
+			{name:'strikethrough', className:'btn-info'},
+			{name:'underline', className:'btn-info'},
+			null,
+			{name:'insertunorderedlist', className:'btn-success'},
+			{name:'insertorderedlist', className:'btn-success'},
+			{name:'outdent', className:'btn-purple'},
+			{name:'indent', className:'btn-purple'},
+			null,
+			{name:'justifyleft', className:'btn-primary'},
+			{name:'justifycenter', className:'btn-primary'},
+			{name:'justifyright', className:'btn-primary'},
+			{name:'justifyfull', className:'btn-inverse'},
+			null,
+			{name:'createLink', className:'btn-pink'},
+			{name:'unlink', className:'btn-pink'},
+			null,
+			{name:'insertImage', className:'btn-success'},
+			null,
+			'foreColor',
+			null,
+			{name:'undo', className:'btn-grey'},
+			{name:'redo', className:'btn-grey'}
+		]
+	}).prev().addClass('wysiwyg-style2');
+	
+	$.getJSON("{{urlfor "TaskController.GetTags"}}", {project_id: {{.projectId}}}, function (out) {
+		$("select[name='start_ver'],select[name='end_ver']").attr('disabled', false);
+		for (v in out.list) {
+			$("select[name='start_ver'],select[name='end_ver']").append('<option value="'+out.list[v]+'">'+out.list[v]+'</option>');
+		}
+	});
+	
+	$(":radio[name='ver_type']").click(function () {
+		if ($(this).val() == 2) {
+			$('#group_start_ver').hide();
+		} else {
+			$('#group_start_ver').show();
+		}
+	});
+});
+</script>
