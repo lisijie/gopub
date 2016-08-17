@@ -25,7 +25,7 @@ CREATE TABLE `t_env` (
   `mail_tpl_id` int(11) NOT NULL DEFAULT '0',
   `mail_to` varchar(1000) NOT NULL DEFAULT '',
   `mail_cc` varchar(1000) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `t_env_project_id` (`project_id`)
@@ -48,7 +48,7 @@ CREATE TABLE `t_mail_tpl` (
   `content` longtext NOT NULL,
   `mail_to` varchar(1000) NOT NULL DEFAULT '',
   `mail_cc` varchar(1000) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -64,7 +64,7 @@ CREATE TABLE `t_project` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `domain` varchar(100) NOT NULL DEFAULT '',
   `version` varchar(20) NOT NULL DEFAULT '',
-  `version_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `version_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `repo_url` varchar(100) NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
   `error_msg` longtext NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE `t_project` (
   `create_verfile` int(11) NOT NULL DEFAULT '0',
   `verfile_path` varchar(50) NOT NULL DEFAULT '',
   `task_review` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发布是否需要审批',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -85,7 +85,7 @@ CREATE TABLE `t_role` (
   `role_name` varchar(20) NOT NULL DEFAULT '',
   `project_ids` varchar(1000) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -107,7 +107,7 @@ CREATE TABLE `t_server` (
   `ssh_pwd` varchar(100) NOT NULL DEFAULT '' COMMENT 'ssh密码',
   `ssh_key` varchar(100) NOT NULL DEFAULT '' COMMENT 'sshkey路径',
   `work_dir` varchar(100) NOT NULL DEFAULT '' COMMENT '工作目录',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -130,7 +130,7 @@ CREATE TABLE `t_task` (
   `pub_log` longtext NOT NULL COMMENT '发布日志',
   `pub_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发布状态',
   `review_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '审批状态',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `t_task_project_id` (`project_id`),
@@ -159,7 +159,7 @@ CREATE TABLE `t_user` (
   `last_login` datetime NOT NULL,
   `last_ip` varchar(15) NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`)
@@ -217,9 +217,9 @@ VALUES
 
 INSERT INTO `t_role` (`id`, `role_name`, `project_ids`, `description`, `create_time`, `update_time`)
 VALUES
-	(1,'系统管理员','','','2016-05-11 10:33:59','2016-05-11 10:33:59'),
-	(2,'发版人员','','','2016-05-11 10:34:15','2016-05-11 10:34:15'),
-	(3,'审批人员','','','2016-05-11 10:34:22','2016-05-11 10:34:22');
+	(1,'系统管理员','','',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
+	(2,'发版人员','','',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
+	(3,'审批人员','','',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 
 INSERT INTO `t_role_perm` (`role_id`, `perm`)
@@ -274,4 +274,4 @@ VALUES
 
 INSERT INTO `t_user` (`id`, `user_name`, `password`, `salt`, `sex`, `email`, `last_login`, `last_ip`, `status`, `create_time`, `update_time`)
 VALUES
-	(1,'admin','7fef6171469e80d32c0559f88b377245','',1,'admin@admin.com','2016-05-11 10:33:49','127.0.0.1',0,'0000-00-00 00:00:00','2016-05-11 10:33:49');
+	(1,'admin','7fef6171469e80d32c0559f88b377245','',1,'admin@admin.com','2016-05-11 10:33:49','127.0.0.1',0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
