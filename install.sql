@@ -125,7 +125,7 @@ CREATE TABLE `t_task` (
   `change_files` longtext NOT NULL COMMENT '修改文件列表',
   `filepath` varchar(200) NOT NULL DEFAULT '' COMMENT '发布包路径',
   `pub_env_id` int(11) NOT NULL DEFAULT '0' COMMENT '发布环境ID',
-  `pub_time` datetime NOT NULL COMMENT '发布时间',
+  `pub_time` datetime DEFAULT NULL COMMENT '发布时间',
   `error_msg` longtext NOT NULL COMMENT '错误消息',
   `pub_log` longtext NOT NULL COMMENT '发布日志',
   `pub_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发布状态',
@@ -134,7 +134,8 @@ CREATE TABLE `t_task` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `t_task_project_id` (`project_id`),
-  KEY `t_task_user_id` (`user_id`)
+  KEY `t_task_user_id` (`user_id`),
+  KEY `pub_time` (`pub_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `t_task_review` (
@@ -156,7 +157,7 @@ CREATE TABLE `t_user` (
   `salt` varchar(10) NOT NULL DEFAULT '',
   `sex` int(11) NOT NULL DEFAULT '0',
   `email` varchar(50) NOT NULL DEFAULT '',
-  `last_login` datetime NOT NULL,
+  `last_login` datetime DEFAULT NULL,
   `last_ip` varchar(15) NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',

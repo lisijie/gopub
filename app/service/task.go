@@ -93,7 +93,7 @@ func (this *taskService) AddTask(task *entity.Task) error {
 		task.ReviewStatus = 1 // 已审批
 	}
 	task.PubStatus = 0
-	task.PubTime = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
+	// task.PubTime = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
 	_, err = o.Insert(task)
 	return err
 }

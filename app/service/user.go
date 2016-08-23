@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/utils"
 	"github.com/lisijie/gopub/app/entity"
 	"github.com/lisijie/gopub/app/libs"
-	"time"
 )
 
 type userService struct{}
@@ -95,7 +94,7 @@ func (this *userService) AddUser(userName, email, password string, sex int) (*en
 	user.Email = email
 	user.Salt = string(utils.RandomCreateBytes(10))
 	user.Password = libs.Md5([]byte(password + user.Salt))
-	user.LastLogin = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
+	// user.LastLogin = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
 	_, err := o.Insert(user)
 	return user, err
 }
