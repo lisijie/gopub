@@ -25,6 +25,16 @@
 
 - v2.0.0 Linux版： [http://pan.baidu.com/s/1jIMwYSA](http://pan.baidu.com/s/1jIMwYSA "gopub-linux-v2.0.0.zip")
 
+
+## 准备
+
+安装beego & bee
+
+```
+$ go get github.com/astaxie/beego
+$ go get github.com/beego/bee
+```
+
 ## 安装
 
 仅支持linux/mac系统，并且要求安装了mysql和git。
@@ -33,9 +43,9 @@
 
 1. 创建数据库，将install.sql导入mysql。
 2. 修改 conf/app.conf 中相关的配置。
-3. 使用命令 `./service.sh start` 启动，如果无法启动，检查主程序 gopub 是否具有可执行权限，使用 `chmod +x ./gopub` 增加权限。
+3. 使用命令 `./service.sh start` 启动，如果无法启动，检查主程序 gopub 是否具有可执行权限，使用 `chmod +x ./gopub` 增加权限。(可选: 使用bee启动`bee run`)
 4. 使用 `http://localhost:8000` 访问。
-5. 后台默认帐号为 `admin`，密码为 `admin888`。 
+5. 后台默认帐号为 `admin`，密码为 `admin888`。
 
 ## 界面截图
 

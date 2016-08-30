@@ -3,3 +3,4 @@ data/*
 logs/*.log
 build.tar.gz
 *.bak
+.idea
