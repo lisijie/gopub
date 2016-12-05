@@ -1,6 +1,6 @@
 #!/bin/sh
 
-tarfile="gopub-$1.tar.gz"
+tarfile="gopub-$1-linux-amd64.tar.gz"
 
 echo "开始打包$tarfile..."
 

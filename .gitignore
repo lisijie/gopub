@@ -1,5 +1,6 @@
 gopub*
 data/*
 logs/*.log
-build.tar.gz
+*.tar.gz
 *.bak
+.DS_Store
