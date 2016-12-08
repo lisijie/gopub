@@ -1,0 +1,26 @@
+version: '2'
+services:
+    mysql:
+        image: mysql
+        expose:
+            - 3306
+        volumes:
+            - ./docker/my-custom.cnf:/etc/mysql/conf.d/my-custom.cnf
+            - ./docker/mysql:/var/lib/mysql
+            - ./install.sql:/docker-entrypoint-initdb.d/install.sql
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+            MYSQL_DATABASE: gopub
+
+    gopub:
+        build: ./docker
+        links:
+            - "mysql:mysql_server"
+        volumes:
+            - ./docker/app.conf:/gopub/conf/app.conf
+            - ./docker/startup.sh:/startup.sh
+        expose:
+            - 8000
+        ports:
+            - "8080:8000"
+        command: ["sh", "startup.sh"]

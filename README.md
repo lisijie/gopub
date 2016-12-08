@@ -1,6 +1,6 @@
 # 版本发布系统
 
-当前版本：v2.0.0
+当前版本：v2.0.1
 
 基于Git的代码发布系统，用于发布PHP等脚本语言开发的项目。使用Go语言和Beego框架开发。本人所在公司已使用了半年，累计超过五百次发版，到目前为止没出过什么问题，现在功能已经比较完善。
 
@@ -23,7 +23,7 @@
 
 ## 下载地址
 
-- v2.0.0 Linux版： [http://pan.baidu.com/s/1jIMwYSA](http://pan.baidu.com/s/1jIMwYSA "gopub-linux-v2.0.0.zip")
+- [https://github.com/lisijie/gopub/releases](https://github.com/lisijie/gopub/releases)
 
 ## 安装
 
@@ -36,6 +36,12 @@
 3. 使用命令 `./service.sh start` 启动，如果无法启动，检查主程序 gopub 是否具有可执行权限，使用 `chmod +x ./gopub` 增加权限。
 4. 使用 `http://localhost:8000` 访问。
 5. 后台默认帐号为 `admin`，密码为 `admin888`。 
+
+## 使用docker运行
+
+在源码目录使用docker-compose启动即可。
+
+	$ docker-compose up
 
 ## 界面截图
 

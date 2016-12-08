@@ -1,0 +1,9 @@
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+sql_mode='NO_AUTO_CREATE_USER'
+default-time-zone='-08:00'
