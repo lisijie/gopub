@@ -1,4 +1,4 @@
-package libs
+package ssh
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"github.com/lisijie/gopub/app/libs/utils"
 )
 
 type ServerConn struct {
@@ -20,7 +21,7 @@ type ServerConn struct {
 }
 
 func NewServerConn(addr, user, key string) *ServerConn {
-	key = RealPath(key)
+	key = utils.RealPath(key)
 	return &ServerConn{
 		addr: addr,
 		user: user,

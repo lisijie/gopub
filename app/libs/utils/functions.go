@@ -1,4 +1,4 @@
-package libs
+package utils
 
 import (
 	"crypto/md5"
@@ -11,25 +11,6 @@ import (
 )
 
 var emailPattern = regexp.MustCompile("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[a-zA-Z0-9](?:[\\w-]*[\\w])?")
-
-const prettyLogFormat = `--pretty=format:%H`
-
-func RefEndName(refStr string) string {
-	if strings.HasPrefix(refStr, "refs/heads/") {
-		// trim the "refs/heads/"
-		return refStr[len("refs/heads/"):]
-	}
-
-	index := strings.LastIndex(refStr, "/")
-	if index != -1 {
-		return refStr[index+1:]
-	}
-	return refStr
-}
-
-func filepathFromSHA1(rootdir, sha1 string) string {
-	return filepath.Join(rootdir, "objects", sha1[:2], sha1[2:])
-}
 
 func IsDir(dir string) bool {
 	f, e := os.Stat(dir)

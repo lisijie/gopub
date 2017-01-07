@@ -1,9 +1,8 @@
-package mail
+package utils
 
 import (
 	"github.com/astaxie/beego"
 	"github.com/lisijie/gomail"
-	"github.com/lisijie/gopub/app/libs"
 	"strings"
 )
 
@@ -32,7 +31,7 @@ func SendMail(subject, content string, to, cc []string) error {
 
 	for _, v := range to {
 		v = strings.TrimSpace(v)
-		if libs.IsEmail([]byte(v)) {
+		if IsEmail([]byte(v)) {
 			exists := false
 			for _, vv := range toList {
 				if v == vv {
@@ -47,7 +46,7 @@ func SendMail(subject, content string, to, cc []string) error {
 	}
 	for _, v := range cc {
 		v = strings.TrimSpace(v)
-		if libs.IsEmail([]byte(v)) {
+		if IsEmail([]byte(v)) {
 			exists := false
 			for _, vv := range ccList {
 				if v == vv {

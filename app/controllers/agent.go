@@ -6,7 +6,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
+	"github.com/lisijie/gopub/app/libs/utils"
+	"github.com/lisijie/gopub/app/libs/ssh"
 	"github.com/lisijie/gopub/app/service"
 	"strconv"
 )
@@ -28,7 +29,7 @@ func (this *AgentController) List() {
 
 	this.Data["count"] = count
 	this.Data["list"] = serverList
-	this.Data["pageBar"] = libs.NewPager(page, int(count), this.pageSize, beego.URLFor("AgentController.List"), true).ToString()
+	this.Data["pageBar"] = utils.NewPager(page, int(count), this.pageSize, beego.URLFor("AgentController.List"), true).ToString()
 	this.Data["pageTitle"] = "跳板机列表"
 	this.display()
 }
@@ -143,12 +144,12 @@ func (this *AgentController) validServer(server *entity.Server) error {
 			return errors.New(err.Message)
 		}
 	}
-	if server.SshKey != "" && !libs.IsFile(libs.RealPath(server.SshKey)) {
+	if server.SshKey != "" && !utils.IsFile(utils.RealPath(server.SshKey)) {
 		return errors.New("SSH Key不存在:" + server.SshKey)
 	}
 
 	addr := fmt.Sprintf("%s:%d", server.Ip, server.SshPort)
-	serv := libs.NewServerConn(addr, server.SshUser, server.SshKey)
+	serv := ssh.NewServerConn(addr, server.SshUser, server.SshKey)
 
 	if err := serv.TryConnect(); err != nil {
 		return errors.New("无法连接到跳板机: " + err.Error())

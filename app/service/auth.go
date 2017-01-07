@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
+	"github.com/lisijie/gopub/app/libs/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -24,8 +24,8 @@ func NewAuth() *AuthService {
 }
 
 // 初始化开放权限
-func (this *AuthService) initOpenPerm() {
-	this.openPerm = map[string]bool{
+func (s *AuthService) initOpenPerm() {
+	s.openPerm = map[string]bool{
 		"main.index":        true,
 		"main.profile":      true,
 		"main.login":        true,
@@ -40,29 +40,29 @@ func (this *AuthService) initOpenPerm() {
 }
 
 // 获取当前登录的用户对象
-func (this *AuthService) GetUser() *entity.User {
-	return this.loginUser
+func (s *AuthService) GetUser() *entity.User {
+	return s.loginUser
 }
 
 // 获取当前登录的用户id
-func (this *AuthService) GetUserId() int {
-	if this.IsLogined() {
-		return this.loginUser.Id
+func (s *AuthService) GetUserId() int {
+	if s.IsLogined() {
+		return s.loginUser.Id
 	}
 	return 0
 }
 
 // 获取当前登录的用户名
-func (this *AuthService) GetUserName() string {
-	if this.IsLogined() {
-		return this.loginUser.UserName
+func (s *AuthService) GetUserName() string {
+	if s.IsLogined() {
+		return s.loginUser.UserName
 	}
 	return ""
 }
 
 // 初始化
-func (this *AuthService) Init(token string) {
-	this.initOpenPerm()
+func (s *AuthService) Init(token string) {
+	s.initOpenPerm()
 	arr := strings.Split(token, "|")
 	beego.Trace("登录验证, token: ", token)
 	if len(arr) == 2 {
@@ -70,9 +70,9 @@ func (this *AuthService) Init(token string) {
 		userId, _ := strconv.Atoi(idstr)
 		if userId > 0 {
 			user, err := UserService.GetUser(userId, true)
-			if err == nil && password == libs.Md5([]byte(user.Password+user.Salt)) {
-				this.loginUser = user
-				this.initPermMap()
+			if err == nil && password == utils.Md5([]byte(user.Password+user.Salt)) {
+				s.loginUser = user
+				s.initPermMap()
 				beego.Trace("验证成功，用户信息: ", user)
 			}
 		}
@@ -80,45 +80,45 @@ func (this *AuthService) Init(token string) {
 }
 
 // 初始化权限表
-func (this *AuthService) initPermMap() {
-	this.permMap = make(map[string]bool)
-	for _, role := range this.loginUser.RoleList {
+func (s *AuthService) initPermMap() {
+	s.permMap = make(map[string]bool)
+	for _, role := range s.loginUser.RoleList {
 		for _, perm := range role.PermList {
-			this.permMap[perm.Key] = true
+			s.permMap[perm.Key] = true
 		}
 	}
 }
 
 // 检查是否有某个权限
-func (this *AuthService) HasAccessPerm(module, action string) bool {
+func (s *AuthService) HasAccessPerm(module, action string) bool {
 	key := module + "." + action
-	if !this.IsLogined() {
+	if !s.IsLogined() {
 		return false
 	}
-	if this.loginUser.Id == 1 || this.isOpenPerm(key) {
+	if s.loginUser.Id == 1 || s.isOpenPerm(key) {
 		return true
 	}
-	if _, ok := this.permMap[key]; ok {
+	if _, ok := s.permMap[key]; ok {
 		return true
 	}
 	return false
 }
 
 // 检查是否登录
-func (this *AuthService) IsLogined() bool {
-	return this.loginUser != nil && this.loginUser.Id > 0
+func (s *AuthService) IsLogined() bool {
+	return s.loginUser != nil && s.loginUser.Id > 0
 }
 
 // 是否公开访问的操作
-func (this *AuthService) isOpenPerm(key string) bool {
-	if _, ok := this.openPerm[key]; ok {
+func (s *AuthService) isOpenPerm(key string) bool {
+	if _, ok := s.openPerm[key]; ok {
 		return true
 	}
 	return false
 }
 
 // 用户登录
-func (this *AuthService) Login(userName, password string) (string, error) {
+func (s *AuthService) Login(userName, password string) (string, error) {
 	user, err := UserService.GetUserByName(userName)
 	if err != nil {
 		if err == orm.ErrNoRows {
@@ -128,7 +128,7 @@ func (this *AuthService) Login(userName, password string) (string, error) {
 		}
 	}
 
-	if user.Password != libs.Md5([]byte(password+user.Salt)) {
+	if user.Password != utils.Md5([]byte(password+user.Salt)) {
 		return "", errors.New("帐号或密码错误")
 	}
 	if user.Status == -1 {
@@ -137,13 +137,13 @@ func (this *AuthService) Login(userName, password string) (string, error) {
 
 	user.LastLogin = time.Now()
 	UserService.UpdateUser(user, "LastLogin")
-	this.loginUser = user
+	s.loginUser = user
 
-	token := fmt.Sprintf("%d|%s", user.Id, libs.Md5([]byte(user.Password+user.Salt)))
+	token := fmt.Sprintf("%d|%s", user.Id, utils.Md5([]byte(user.Password+user.Salt)))
 	return token, nil
 }
 
 // 退出登录
-func (this *AuthService) Logout() error {
+func (s *AuthService) Logout() error {
 	return nil
 }
