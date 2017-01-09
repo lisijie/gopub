@@ -26,27 +26,27 @@ type BaseController struct {
 }
 
 // 重写GetString方法，移除前后空格
-func (this *BaseController) GetString(name string, def ...string) string {
-	return strings.TrimSpace(this.Controller.GetString(name, def...))
+func (c *BaseController) GetString(name string, def ...string) string {
+	return strings.TrimSpace(c.Controller.GetString(name, def...))
 }
 
-func (this *BaseController) Prepare() {
-	this.Ctx.Output.Header("X-Powered-By", "GoPub/"+beego.AppConfig.String("version"))
-	this.Ctx.Output.Header("X-Author-By", "lisijie")
-	controllerName, actionName := this.GetControllerAndAction()
-	this.controllerName = strings.ToLower(controllerName[0 : len(controllerName)-10])
-	this.actionName = strings.ToLower(actionName)
-	this.pageSize = 20
-	this.initAuth()
-	this.initLang()
-	this.getMenuList()
+func (c *BaseController) Prepare() {
+	c.Ctx.Output.Header("X-Powered-By", "GoPub/"+beego.AppConfig.String("version"))
+	c.Ctx.Output.Header("X-Author-By", "lisijie")
+	controllerName, actionName := c.GetControllerAndAction()
+	c.controllerName = strings.ToLower(controllerName[0 : len(controllerName)-10])
+	c.actionName = strings.ToLower(actionName)
+	c.pageSize = 20
+	c.initAuth()
+	c.initLang()
+	c.getMenuList()
 }
 
-func (this *BaseController) initLang() {
-	this.lang = "zh-CN"
-	this.Data["lang"] = this.lang
-	if !i18n.IsExist(this.lang) {
-		if err := i18n.SetMessage(this.lang, beego.AppPath+"/conf/locale_"+this.lang+".ini"); err != nil {
+func (c *BaseController) initLang() {
+	c.lang = "zh-CN"
+	c.Data["lang"] = c.lang
+	if !i18n.IsExist(c.lang) {
+		if err := i18n.SetMessage(c.lang, beego.AppPath+"/conf/locale_"+c.lang+".ini"); err != nil {
 			beego.Error("Fail to set message file: " + err.Error())
 			return
 		}
@@ -55,99 +55,98 @@ func (this *BaseController) initLang() {
 }
 
 //登录验证
-func (this *BaseController) initAuth() {
-	token := this.Ctx.GetCookie("auth")
-	this.auth = service.NewAuth()
-	this.auth.Init(token)
-	this.userId = this.auth.GetUserId()
+func (c *BaseController) initAuth() {
+	token := c.Ctx.GetCookie("auth")
+	c.auth = service.NewAuth(token)
+	c.userId = c.auth.GetUserId()
 
-	if !this.auth.IsLogined() {
-		if this.controllerName != "main" ||
-			(this.controllerName == "main" && this.actionName != "logout" && this.actionName != "login") {
-			this.redirect(beego.URLFor("MainController.Login"))
+	if !c.auth.IsLogined() {
+		if c.controllerName != "main" ||
+			(c.controllerName == "main" && c.actionName != "logout" && c.actionName != "login") {
+			c.redirect(beego.URLFor("MainController.Login"))
 		}
 	} else {
-		if !this.auth.HasAccessPerm(this.controllerName, this.actionName) {
-			this.showMsg("您没有执行该操作的权限", MSG_ERR)
+		if !c.auth.HasAccessPerm(c.controllerName, c.actionName) {
+			c.showMsg("您没有执行该操作的权限", MSG_ERR)
 		}
 	}
 }
 
 //渲染模版
-func (this *BaseController) display(tpl ...string) {
+func (c *BaseController) display(tpl ...string) {
 	var tplname string
 	if len(tpl) > 0 {
 		tplname = tpl[0] + ".html"
 	} else {
-		tplname = this.controllerName + "/" + this.actionName + ".html"
+		tplname = c.controllerName + "/" + c.actionName + ".html"
 	}
 
-	this.Layout = "layout/layout.html"
-	this.TplName = tplname
+	c.Layout = "layout/layout.html"
+	c.TplName = tplname
 
-	this.LayoutSections = make(map[string]string)
-	this.LayoutSections["Header"] = "layout/sections/header.html"
-	this.LayoutSections["Footer"] = "layout/sections/footer.html"
-	this.LayoutSections["Navbar"] = "layout/sections/navbar.html"
-	this.LayoutSections["Sidebar"] = "layout/sections/sidebar.html"
+	c.LayoutSections = make(map[string]string)
+	c.LayoutSections["Header"] = "layout/sections/header.html"
+	c.LayoutSections["Footer"] = "layout/sections/footer.html"
+	c.LayoutSections["Navbar"] = "layout/sections/navbar.html"
+	c.LayoutSections["Sidebar"] = "layout/sections/sidebar.html"
 
-	user := this.auth.GetUser()
+	user := c.auth.GetUser()
 
-	this.Data["version"] = beego.AppConfig.String("version")
-	this.Data["curRoute"] = this.controllerName + "." + this.actionName
-	this.Data["loginUserId"] = user.Id
-	this.Data["loginUserName"] = user.UserName
-	this.Data["loginUserSex"] = user.Sex
-	this.Data["menuList"] = this.getMenuList()
+	c.Data["version"] = beego.AppConfig.String("version")
+	c.Data["curRoute"] = c.controllerName + "." + c.actionName
+	c.Data["loginUserId"] = user.Id
+	c.Data["loginUserName"] = user.UserName
+	c.Data["loginUserSex"] = user.Sex
+	c.Data["menuList"] = c.getMenuList()
 }
 
 // 重定向
-func (this *BaseController) redirect(url string) {
-	if this.IsAjax() {
-		this.showMsg("", MSG_REDIRECT, url)
+func (c *BaseController) redirect(url string) {
+	if c.IsAjax() {
+		c.showMsg("", MSG_REDIRECT, url)
 	} else {
-		this.Redirect(url, 302)
-		this.StopRun()
+		c.Redirect(url, 302)
+		c.StopRun()
 	}
 }
 
 // 是否POST提交
-func (this *BaseController) isPost() bool {
-	return this.Ctx.Request.Method == "POST"
+func (c *BaseController) isPost() bool {
+	return c.Ctx.Request.Method == "POST"
 }
 
 // 提示消息
-func (this *BaseController) showMsg(msg string, msgno int, redirect ...string) {
+func (c *BaseController) showMsg(msg string, code int, redirect ...string) {
 	out := make(map[string]interface{})
-	out["status"] = msgno
+	out["status"] = code
 	out["msg"] = msg
 	out["redirect"] = ""
 	if len(redirect) > 0 {
 		out["redirect"] = redirect[0]
 	}
 
-	if this.IsAjax() {
-		this.jsonResult(out)
+	if c.IsAjax() {
+		c.jsonResult(out)
 	} else {
 		for k, v := range out {
-			this.Data[k] = v
+			c.Data[k] = v
 		}
-		this.display("error/message")
-		this.Render()
-		this.StopRun()
+		c.display("error/message")
+		c.Render()
+		c.StopRun()
 	}
 }
 
 //获取用户IP地址
-func (this *BaseController) getClientIp() string {
-	if p := this.Ctx.Input.Proxy(); len(p) > 0 {
+func (c *BaseController) getClientIp() string {
+	if p := c.Ctx.Input.Proxy(); len(p) > 0 {
 		return p[0]
 	}
-	return this.Ctx.Input.IP()
+	return c.Ctx.Input.IP()
 }
 
 // 功能菜单
-func (this *BaseController) getMenuList() []Menu {
+func (c *BaseController) getMenuList() []Menu {
 	var menuList []Menu
 	allMenu := make([]Menu, 0)
 	content, err := ioutil.ReadFile("conf/menu.json")
@@ -162,7 +161,7 @@ func (this *BaseController) getMenuList() []Menu {
 		subs := make([]SubMenu, 0)
 		for _, sub := range menu.Submenu {
 			route := strings.Split(sub.Route, ".")
-			if this.auth.HasAccessPerm(route[0], route[1]) {
+			if c.auth.HasAccessPerm(route[0], route[1]) {
 				subs = append(subs, sub)
 			}
 		}
@@ -172,20 +171,19 @@ func (this *BaseController) getMenuList() []Menu {
 		}
 	}
 	//menuList = allMenu
-
 	return menuList
 }
 
 // 输出json
-func (this *BaseController) jsonResult(out interface{}) {
-	this.Data["json"] = out
-	this.ServeJSON()
-	this.StopRun()
+func (c *BaseController) jsonResult(out interface{}) {
+	c.Data["json"] = out
+	c.ServeJSON()
+	c.StopRun()
 }
 
 // 错误检查
-func (this *BaseController) checkError(err error) {
+func (c *BaseController) checkError(err error) {
 	if err != nil {
-		this.showMsg(err.Error(), MSG_ERR)
+		c.showMsg(err.Error(), MSG_ERR)
 	}
 }

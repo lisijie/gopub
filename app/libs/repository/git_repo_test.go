@@ -1,4 +1,4 @@
-package git
+package repository
 
 import (
     "testing"
@@ -14,9 +14,11 @@ func getPath() string {
 
 func TestClone(t *testing.T) {
     os.RemoveAll(getPath())
-    repo := &GitRepository{}
-    repo.Init(fmt.Sprintf(`{"path":"%s"}`, getPath()))
-    err := repo.CloneFrom("https://github.com/lisijie/cron.git")
+    repo := &GitRepository{
+        Path: getPath(),
+        RemoteUrl: "https://github.com/lisijie/cron.git",
+    }
+    err := repo.Clone()
     if err != nil {
         t.Error(err)
     }

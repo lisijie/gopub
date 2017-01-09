@@ -17,97 +17,97 @@ type AgentController struct {
 }
 
 // 列表
-func (this *AgentController) List() {
-	page, _ := strconv.Atoi(this.GetString("page"))
+func (c *AgentController) List() {
+	page, _ := strconv.Atoi(c.GetString("page"))
 	if page < 1 {
 		page = 1
 	}
 	count, err := service.ServerService.GetTotal(service.SERVER_TYPE_AGENT)
-	this.checkError(err)
-	serverList, err := service.ServerService.GetAgentList(page, this.pageSize)
-	this.checkError(err)
+	c.checkError(err)
+	serverList, err := service.ServerService.GetAgentList(page, c.pageSize)
+	c.checkError(err)
 
-	this.Data["count"] = count
-	this.Data["list"] = serverList
-	this.Data["pageBar"] = utils.NewPager(page, int(count), this.pageSize, beego.URLFor("AgentController.List"), true).ToString()
-	this.Data["pageTitle"] = "跳板机列表"
-	this.display()
+	c.Data["count"] = count
+	c.Data["list"] = serverList
+	c.Data["pageBar"] = utils.NewPager(page, int(count), c.pageSize, beego.URLFor("AgentController.List"), true).ToString()
+	c.Data["pageTitle"] = "跳板机列表"
+	c.display()
 }
 
 // 添加
-func (this *AgentController) Add() {
-	if this.isPost() {
+func (c *AgentController) Add() {
+	if c.isPost() {
 		server := &entity.Server{}
 		server.TypeId = service.SERVER_TYPE_AGENT
-		server.Ip = this.GetString("server_ip")
-		server.Area = this.GetString("area")
-		server.SshPort, _ = this.GetInt("ssh_port")
-		server.SshUser = this.GetString("ssh_user")
-		server.SshPwd = this.GetString("ssh_pwd")
-		server.SshKey = this.GetString("ssh_key")
-		server.WorkDir = this.GetString("work_dir")
-		server.Description = this.GetString("description")
-		err := this.validServer(server)
-		this.checkError(err)
+		server.Ip = c.GetString("server_ip")
+		server.Area = c.GetString("area")
+		server.SshPort, _ = c.GetInt("ssh_port")
+		server.SshUser = c.GetString("ssh_user")
+		server.SshPwd = c.GetString("ssh_pwd")
+		server.SshKey = c.GetString("ssh_key")
+		server.WorkDir = c.GetString("work_dir")
+		server.Description = c.GetString("description")
+		err := c.validServer(server)
+		c.checkError(err)
 		err = service.ServerService.AddServer(server)
-		this.checkError(err)
-		//service.ActionService.Add("add_agent", this.auth.GetUserName(), "server", server.Id, server.Ip)
-		this.redirect(beego.URLFor("AgentController.List"))
+		c.checkError(err)
+		//service.ActionService.Add("add_agent", c.auth.GetUserName(), "server", server.Id, server.Ip)
+		c.redirect(beego.URLFor("AgentController.List"))
 	}
 
-	this.Data["pageTitle"] = "添加跳板机"
-	this.display()
+	c.Data["pageTitle"] = "添加跳板机"
+	c.display()
 }
 
 // 编辑
-func (this *AgentController) Edit() {
-	id, _ := this.GetInt("id")
+func (c *AgentController) Edit() {
+	id, _ := c.GetInt("id")
 	server, err := service.ServerService.GetServer(id, service.SERVER_TYPE_AGENT)
-	this.checkError(err)
+	c.checkError(err)
 
-	if this.isPost() {
-		server.Ip = this.GetString("server_ip")
-		server.Area = this.GetString("area")
-		server.SshPort, _ = this.GetInt("ssh_port")
-		server.SshUser = this.GetString("ssh_user")
-		server.SshPwd = this.GetString("ssh_pwd")
-		server.SshKey = this.GetString("ssh_key")
-		server.WorkDir = this.GetString("work_dir")
-		server.Description = this.GetString("description")
-		err := this.validServer(server)
-		this.checkError(err)
+	if c.isPost() {
+		server.Ip = c.GetString("server_ip")
+		server.Area = c.GetString("area")
+		server.SshPort, _ = c.GetInt("ssh_port")
+		server.SshUser = c.GetString("ssh_user")
+		server.SshPwd = c.GetString("ssh_pwd")
+		server.SshKey = c.GetString("ssh_key")
+		server.WorkDir = c.GetString("work_dir")
+		server.Description = c.GetString("description")
+		err := c.validServer(server)
+		c.checkError(err)
 		err = service.ServerService.UpdateServer(server)
-		this.checkError(err)
-		//service.ActionService.Add("edit_agent", this.auth.GetUserName(), "server", server.Id, server.Ip)
-		this.redirect(beego.URLFor("AgentController.List"))
+		c.checkError(err)
+		//service.ActionService.Add("edit_agent", c.auth.GetUserName(), "server", server.Id, server.Ip)
+		c.redirect(beego.URLFor("AgentController.List"))
 	}
 
-	this.Data["pageTitle"] = "编辑跳板机"
-	this.Data["server"] = server
-	this.display()
+	c.Data["pageTitle"] = "编辑跳板机"
+	c.Data["server"] = server
+	c.display()
 }
 
 // 删除
-func (this *AgentController) Del() {
-	id, _ := this.GetInt("id")
+func (c *AgentController) Del() {
+	id, _ := c.GetInt("id")
 
 	_, err := service.ServerService.GetServer(id, service.SERVER_TYPE_AGENT)
-	this.checkError(err)
+	c.checkError(err)
 
 	err = service.ServerService.DeleteServer(id)
-	this.checkError(err)
-	//service.ActionService.Add("del_agent", this.auth.GetUserName(), "server", id, "")
+	c.checkError(err)
+	//service.ActionService.Add("del_agent", c.auth.GetUserName(), "server", id, "")
 
-	this.redirect(beego.URLFor("AgentController.List"))
+	c.redirect(beego.URLFor("AgentController.List"))
 }
 
 // 项目列表
-func (this *AgentController) Projects() {
-	id, _ := this.GetInt("id")
+func (c *AgentController) Projects() {
+	id, _ := c.GetInt("id")
 	server, err := service.ServerService.GetServer(id, service.SERVER_TYPE_AGENT)
-	this.checkError(err)
+	c.checkError(err)
 	envList, err := service.EnvService.GetEnvListByServerId(id)
-	this.checkError(err)
+	c.checkError(err)
 
 	result := make(map[int]map[string]interface{})
 	for _, env := range envList {
@@ -126,13 +126,13 @@ func (this *AgentController) Projects() {
 		}
 	}
 
-	this.Data["list"] = result
-	this.Data["server"] = server
-	this.Data["pageTitle"] = server.Ip + " 下的项目列表"
-	this.display()
+	c.Data["list"] = result
+	c.Data["server"] = server
+	c.Data["pageTitle"] = server.Ip + " 下的项目列表"
+	c.display()
 }
 
-func (this *AgentController) validServer(server *entity.Server) error {
+func (c *AgentController) validServer(server *entity.Server) error {
 	valid := validation.Validation{}
 	valid.Required(server.Ip, "ip").Message("请输入服务器IP")
 	valid.Range(server.SshPort, 1, 65535, "ssh_port").Message("SSH端口无效")

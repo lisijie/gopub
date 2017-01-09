@@ -2,7 +2,6 @@ package repository
 
 import (
     "time"
-    "github.com/lisijie/gopub/app/libs/repository/git"
 )
 
 type Repository interface {
@@ -15,11 +14,14 @@ type Repository interface {
     // 获取分支列表
     GetBranches() ([]string, error)
     // 导出整个分支
-    Export(branch string, filename string) error
+    Export(branch, filename string) error
     // 导出两个分支的差异文件
-    ExportDiffFiles(ver1 string, ver2 string, filename string) error
+    ExportDiffFiles(fromVer, toVer, filename string) error
     // 获取修改列表
-    GetChangeList() (*ChangeList, error)
+    GetChangeLogs(fromVer, toVer string) ([]string, error)
+
+    GetChangeFiles(fromVer, toVer string) ([]string, error)
+
 }
 
 type Config struct {
@@ -40,13 +42,14 @@ type ChangeLog struct {
 }
 
 type ChangeFile struct {
+    Flag string
     Filename string
 }
 
 func NewRepository(t string, config *Config) Repository {
     var repo Repository
     if t == "GIT" {
-        repo = &git.GitRepository{
+        repo = &GitRepository{
             Path: config.ClonePath,
             RemoteUrl: config.RemoteUrl,
             Username: config.Username,

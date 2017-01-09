@@ -90,12 +90,7 @@ func (s *projectService) CloneRepo(projectId int) error {
     if err != nil {
         return err
     }
-    repo := repository.NewRepository(project.RepoType, &repository.Config{
-        ClonePath: GetProjectPath(project.Domain),
-        RemoteUrl: project.RepoUrl,
-        Username: project.RepoUser,
-        Password: project.RepoPassword,
-    })
+    repo, _ := s.GetRepository(project.Id)
     err = repo.Clone()
     if err != nil {
         project.Status = -1
@@ -105,4 +100,18 @@ func (s *projectService) CloneRepo(projectId int) error {
     }
     ProjectService.UpdateProject(project, "Status", "ErrorMsg")
     return err
+}
+
+func (s *projectService) GetRepository(projectId int) (repository.Repository, error) {
+    project, err := s.GetProject(projectId)
+    if err != nil {
+        return nil, err
+    }
+    repo := repository.NewRepository(project.RepoType, &repository.Config{
+        ClonePath: GetProjectPath(project.Domain),
+        RemoteUrl: project.RepoUrl,
+        Username: project.RepoUser,
+        Password: project.RepoPassword,
+    })
+    return repo, err
 }

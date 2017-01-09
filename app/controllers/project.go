@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
+	"github.com/lisijie/gopub/app/libs/utils"
+	"github.com/lisijie/gopub/app/libs/ssh"
 	"github.com/lisijie/gopub/app/service"
 	"strconv"
 	"strings"
@@ -15,150 +16,150 @@ type ProjectController struct {
 }
 
 // 项目列表
-func (this *ProjectController) List() {
-	page, _ := strconv.Atoi(this.GetString("page"))
+func (c *ProjectController) List() {
+	page, _ := strconv.Atoi(c.GetString("page"))
 	if page < 1 {
 		page = 1
 	}
 
 	count, _ := service.ProjectService.GetTotal()
-	list, _ := service.ProjectService.GetList(page, this.pageSize)
+	list, _ := service.ProjectService.GetList(page, c.pageSize)
 
-	this.Data["count"] = count
-	this.Data["list"] = list
-	this.Data["pageBar"] = libs.NewPager(page, int(count), this.pageSize, beego.URLFor("ProjectController.List"), true).ToString()
-	this.Data["pageTitle"] = "项目列表"
-	this.display()
+	c.Data["count"] = count
+	c.Data["list"] = list
+	c.Data["pageBar"] = utils.NewPager(page, int(count), c.pageSize, beego.URLFor("ProjectController.List"), true).ToString()
+	c.Data["pageTitle"] = "项目列表"
+	c.display()
 }
 
 // 添加项目
-func (this *ProjectController) Add() {
+func (c *ProjectController) Add() {
 
-	if this.isPost() {
+	if c.isPost() {
 		p := &entity.Project{}
-		p.Name = this.GetString("project_name")
-		p.Domain = this.GetString("project_domain")
-		p.RepoUrl = this.GetString("repo_url")
-		p.AgentId, _ = this.GetInt("agent_id")
-		p.IgnoreList = this.GetString("ignore_list")
-		p.BeforeShell = this.GetString("before_shell")
-		p.AfterShell = this.GetString("after_shell")
-		p.TaskReview, _ = this.GetInt("task_review")
-		if v, _ := this.GetInt("create_verfile"); v > 0 {
+		p.Name = c.GetString("project_name")
+		p.Domain = c.GetString("project_domain")
+		p.RepoUrl = c.GetString("repo_url")
+		p.AgentId, _ = c.GetInt("agent_id")
+		p.IgnoreList = c.GetString("ignore_list")
+		p.BeforeShell = c.GetString("before_shell")
+		p.AfterShell = c.GetString("after_shell")
+		p.TaskReview, _ = c.GetInt("task_review")
+		if v, _ := c.GetInt("create_verfile"); v > 0 {
 			p.CreateVerfile = 1
 		} else {
 			p.CreateVerfile = 0
 		}
-		p.VerfilePath = strings.Replace(this.GetString("verfile_path"), ".", "", -1)
+		p.VerfilePath = strings.Replace(c.GetString("verfile_path"), ".", "", -1)
 
-		if err := this.validProject(p); err != nil {
-			this.showMsg(err.Error(), MSG_ERR)
+		if err := c.validProject(p); err != nil {
+			c.showMsg(err.Error(), MSG_ERR)
 		}
 
 		err := service.ProjectService.AddProject(p)
-		this.checkError(err)
+		c.checkError(err)
 
 		// 克隆仓库
 		go service.ProjectService.CloneRepo(p.Id)
 
-		service.ActionService.Add("add_project", this.auth.GetUserName(), "project", p.Id, "")
+		service.ActionService.Add("add_project", c.auth.GetUserName(), "project", p.Id, "")
 
-		this.redirect(beego.URLFor("ProjectController.List"))
+		c.redirect(beego.URLFor("ProjectController.List"))
 	}
 
 	agentList, err := service.ServerService.GetAgentList(1, -1)
-	this.checkError(err)
-	this.Data["pageTitle"] = "添加项目"
-	this.Data["agentList"] = agentList
-	this.display()
+	c.checkError(err)
+	c.Data["pageTitle"] = "添加项目"
+	c.Data["agentList"] = agentList
+	c.display()
 }
 
 // 编辑项目
-func (this *ProjectController) Edit() {
-	id, _ := this.GetInt("id")
+func (c *ProjectController) Edit() {
+	id, _ := c.GetInt("id")
 	p, err := service.ProjectService.GetProject(id)
-	this.checkError(err)
+	c.checkError(err)
 
-	if this.isPost() {
-		p.Name = this.GetString("project_name")
-		p.AgentId, _ = this.GetInt("agent_id")
-		p.IgnoreList = this.GetString("ignore_list")
-		p.BeforeShell = this.GetString("before_shell")
-		p.AfterShell = this.GetString("after_shell")
-		p.TaskReview, _ = this.GetInt("task_review")
+	if c.isPost() {
+		p.Name = c.GetString("project_name")
+		p.AgentId, _ = c.GetInt("agent_id")
+		p.IgnoreList = c.GetString("ignore_list")
+		p.BeforeShell = c.GetString("before_shell")
+		p.AfterShell = c.GetString("after_shell")
+		p.TaskReview, _ = c.GetInt("task_review")
 		if p.Status == -1 {
-			p.RepoUrl = this.GetString("repo_url")
+			p.RepoUrl = c.GetString("repo_url")
 		}
-		if v, _ := this.GetInt("create_verfile"); v > 0 {
+		if v, _ := c.GetInt("create_verfile"); v > 0 {
 			p.CreateVerfile = 1
 		} else {
 			p.CreateVerfile = 0
 		}
-		p.VerfilePath = strings.Replace(this.GetString("verfile_path"), ".", "", -1)
+		p.VerfilePath = strings.Replace(c.GetString("verfile_path"), ".", "", -1)
 
-		if err := this.validProject(p); err != nil {
-			this.showMsg(err.Error(), MSG_ERR)
+		if err := c.validProject(p); err != nil {
+			c.showMsg(err.Error(), MSG_ERR)
 		}
 
 		err := service.ProjectService.UpdateProject(p, "Name", "AgentId", "IgnoreList", "BeforeShell", "AfterShell", "RepoUrl", "CreateVerfile", "VerfilePath", "TaskReview")
-		this.checkError(err)
+		c.checkError(err)
 
-		service.ActionService.Add("edit_project", this.auth.GetUserName(), "project", p.Id, "")
+		service.ActionService.Add("edit_project", c.auth.GetUserName(), "project", p.Id, "")
 
-		this.redirect(beego.URLFor("ProjectController.List"))
+		c.redirect(beego.URLFor("ProjectController.List"))
 	}
 
 	agentList, err := service.ServerService.GetAgentList(1, -1)
-	this.checkError(err)
+	c.checkError(err)
 
-	this.Data["project"] = p
-	this.Data["agentList"] = agentList
-	this.Data["pageTitle"] = "编辑项目"
-	this.display()
+	c.Data["project"] = p
+	c.Data["agentList"] = agentList
+	c.Data["pageTitle"] = "编辑项目"
+	c.display()
 }
 
 // 删除项目
-func (this *ProjectController) Del() {
-	id, _ := this.GetInt("id")
+func (c *ProjectController) Del() {
+	id, _ := c.GetInt("id")
 
 	err := service.ProjectService.DeleteProject(id)
-	this.checkError(err)
+	c.checkError(err)
 
-	service.ActionService.Add("del_project", this.auth.GetUserName(), "project", id, "")
+	service.ActionService.Add("del_project", c.auth.GetUserName(), "project", id, "")
 
-	this.redirect(beego.URLFor("ProjectController.List"))
+	c.redirect(beego.URLFor("ProjectController.List"))
 }
 
 // 重新克隆
-func (this *ProjectController) Clone() {
-	id, _ := this.GetInt("id")
+func (c *ProjectController) Clone() {
+	id, _ := c.GetInt("id")
 	project, err := service.ProjectService.GetProject(id)
-	this.checkError(err)
+	c.checkError(err)
 	if project.Status != -1 {
-		this.showMsg("只能对克隆失败的项目操作.", MSG_ERR)
+		c.showMsg("只能对克隆失败的项目操作.", MSG_ERR)
 	}
 
 	project.Status = 0
 	service.ProjectService.UpdateProject(project, "Status")
 	go service.ProjectService.CloneRepo(id)
 
-	this.showMsg("", MSG_OK)
+	c.showMsg("", MSG_OK)
 }
 
 // 获取项目克隆状态
-func (this *ProjectController) GetStatus() {
-	id, _ := this.GetInt("id")
+func (c *ProjectController) GetStatus() {
+	id, _ := c.GetInt("id")
 	project, _ := service.ProjectService.GetProject(id)
 
 	out := make(map[string]interface{})
 	out["status"] = project.Status
 	out["error"] = project.ErrorMsg
 
-	this.jsonResult(out)
+	c.jsonResult(out)
 }
 
 // 验证提交
-func (this *ProjectController) validProject(p *entity.Project) error {
+func (c *ProjectController) validProject(p *entity.Project) error {
 	errorMsg := ""
 	if p.Name == "" {
 		errorMsg = "请输入项目名称"
@@ -174,7 +175,7 @@ func (this *ProjectController) validProject(p *entity.Project) error {
 			return err
 		}
 		addr := fmt.Sprintf("%s:%d", agent.Ip, agent.SshPort)
-		serv := libs.NewServerConn(addr, agent.SshUser, agent.SshKey)
+		serv := ssh.NewServerConn(addr, agent.SshUser, agent.SshKey)
 		workPath := fmt.Sprintf("%s/%s", agent.WorkDir, p.Domain)
 
 		if err := serv.TryConnect(); err != nil {

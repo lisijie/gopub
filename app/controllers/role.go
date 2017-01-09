@@ -11,78 +11,78 @@ type RoleController struct {
 	BaseController
 }
 
-func (this *RoleController) List() {
+func (c *RoleController) List() {
 	roleList, err := service.RoleService.GetAllRoles()
-	this.checkError(err)
+	c.checkError(err)
 	for k, role := range roleList {
 		roleList[k].UserList, _ = service.UserService.GetUserListByRoleId(role.Id)
 	}
-	this.Data["pageTitle"] = "角色管理"
-	this.Data["list"] = roleList
-	this.display()
+	c.Data["pageTitle"] = "角色管理"
+	c.Data["list"] = roleList
+	c.display()
 }
 
-func (this *RoleController) Add() {
-	if this.isPost() {
+func (c *RoleController) Add() {
+	if c.isPost() {
 		role := &entity.Role{}
-		role.RoleName = this.GetString("role_name")
-		role.Description = this.GetString("description")
+		role.RoleName = c.GetString("role_name")
+		role.Description = c.GetString("description")
 		if role.RoleName == "" {
-			this.showMsg("角色名不能为空", MSG_ERR)
+			c.showMsg("角色名不能为空", MSG_ERR)
 		}
 		err := service.RoleService.AddRole(role)
-		this.checkError(err)
-		this.redirect(beego.URLFor("RoleController.List"))
+		c.checkError(err)
+		c.redirect(beego.URLFor("RoleController.List"))
 	}
-	this.Data["pageTitle"] = "创建角色"
-	this.display()
+	c.Data["pageTitle"] = "创建角色"
+	c.display()
 }
 
-func (this *RoleController) Edit() {
-	id, _ := this.GetInt("id")
+func (c *RoleController) Edit() {
+	id, _ := c.GetInt("id")
 	role, err := service.RoleService.GetRole(id)
-	this.checkError(err)
+	c.checkError(err)
 
-	if this.isPost() {
-		role.RoleName = this.GetString("role_name")
-		role.Description = this.GetString("description")
+	if c.isPost() {
+		role.RoleName = c.GetString("role_name")
+		role.Description = c.GetString("description")
 		err := service.RoleService.UpdateRole(role, "RoleName", "Description")
-		this.checkError(err)
-		this.redirect(beego.URLFor("RoleController.List"))
+		c.checkError(err)
+		c.redirect(beego.URLFor("RoleController.List"))
 	}
 
-	this.Data["pageTitle"] = "编辑角色"
-	this.Data["role"] = role
-	this.display()
+	c.Data["pageTitle"] = "编辑角色"
+	c.Data["role"] = role
+	c.display()
 }
 
-func (this *RoleController) Del() {
-	id, _ := this.GetInt("id")
+func (c *RoleController) Del() {
+	id, _ := c.GetInt("id")
 
 	err := service.RoleService.DeleteRole(id)
-	this.checkError(err)
+	c.checkError(err)
 
-	this.redirect(beego.URLFor("RoleController.List"))
+	c.redirect(beego.URLFor("RoleController.List"))
 }
 
-func (this *RoleController) Perm() {
-	id, _ := this.GetInt("id")
+func (c *RoleController) Perm() {
+	id, _ := c.GetInt("id")
 	role, err := service.RoleService.GetRole(id)
-	this.checkError(err)
+	c.checkError(err)
 
-	if this.isPost() {
-		pids := this.GetStrings("pids")
-		perms := this.GetStrings("perms")
+	if c.isPost() {
+		pids := c.GetStrings("pids")
+		perms := c.GetStrings("perms")
 		if len(pids) == 0 {
 			role.ProjectIds = ""
 		} else {
 			role.ProjectIds = strings.Join(pids, ",")
 		}
 		err := service.RoleService.UpdateRole(role, "ProjectIds")
-		this.checkError(err)
+		c.checkError(err)
 		err = service.RoleService.SetPerm(role.Id, perms)
-		this.checkError(err)
-		this.redirect(beego.URLFor("RoleController.List"))
+		c.checkError(err)
+		c.redirect(beego.URLFor("RoleController.List"))
 	}
 
 	projectList, _ := service.ProjectService.GetAllProject()
@@ -99,10 +99,10 @@ func (this *RoleController) Perm() {
 		}
 	}
 
-	this.Data["pageTitle"] = "编辑权限"
-	this.Data["permList"] = permList
-	this.Data["projectList"] = projectList
-	this.Data["role"] = role
-	this.Data["chkmap"] = chkmap
-	this.display()
+	c.Data["pageTitle"] = "编辑权限"
+	c.Data["permList"] = permList
+	c.Data["projectList"] = projectList
+	c.Data["role"] = role
+	c.Data["chkmap"] = chkmap
+	c.display()
 }

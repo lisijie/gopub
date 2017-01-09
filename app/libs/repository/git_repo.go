@@ -1,11 +1,10 @@
-package git
+package repository
 
 import (
     "strings"
     "fmt"
     "net/url"
     "github.com/lisijie/gopub/app/libs/command"
-    "github.com/lisijie/gopub/app/libs/repository"
 )
 
 type GitRepository struct {
@@ -25,14 +24,14 @@ func (r *GitRepository) Clone() error {
             repoUrl = "http://" + auth + "@" + repoUrl[7:]
         }
     }
-    cmdStr := fmt.Sprintf("git clone -q %s %s", repoUrl, r.Path)
+    cmdStr := fmt.Sprintf("git clone --mirror -q %s %s", repoUrl, r.Path)
     cmd := command.NewCommand(cmdStr)
     err := cmd.Run()
     return err
 }
 
 func (r *GitRepository) Update() error {
-    cmd := command.NewCommand("git pull")
+    cmd := command.NewCommand("git remote update")
     err := cmd.RunInDir(r.Path)
     return err
 }
@@ -47,7 +46,7 @@ func (r *GitRepository) GetTags() ([]string, error) {
 }
 
 func (r *GitRepository) GetBranches() ([]string, error) {
-    cmd := command.NewCommand("git branch -r --no-color")
+    cmd := command.NewCommand("git branch --no-color")
     if err := cmd.RunInDir(r.Path); err != nil {
         return nil, err
     }
@@ -63,18 +62,22 @@ func (r *GitRepository) GetBranches() ([]string, error) {
     return branches, nil
 }
 
-func (r *GitRepository) Export(branch string, filename string) error {
+func (r *GitRepository) Export(branch, filename string) error {
     cmdStr := "git archive --format=tar " + branch + " | gzip > " + filename
     cmd := command.NewCommand(cmdStr)
     return cmd.RunInDir(r.Path)
 }
 
-func (r *GitRepository) ExportDiffFiles(ver1 string, ver2 string, filename string) error {
-    cmdStr := "git archive --format=tar " + ver1 + " $(git diff --name-status -b " + ver1 + " " + ver2 + " | grep -v ^D | awk '{print $2}') | gzip > " + filename
+func (r *GitRepository) ExportDiffFiles(fromVer, toVer, filename string) error {
+    cmdStr := "git archive --format=tar " + toVer + " $(git diff --name-status -b " + fromVer + " " + toVer + " | grep -v ^D | awk '{print $2}') | gzip > " + filename
     cmd := command.NewCommand(cmdStr)
     return cmd.RunInDir(r.Path)
 }
 
-func (r *GitRepository) GetChangeList() (*repository.ChangeList, error) {
+func (r *GitRepository) GetChangeLogs(fromVer, toVer string) ([]string, error) {
+    return nil, nil
+}
+
+func (r *GitRepository) GetChangeFiles(fromVer, toVer string) ([]string, error) {
     return nil, nil
 }

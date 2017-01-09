@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
+	"github.com/lisijie/gopub/app/libs/utils"
 	"github.com/lisijie/gopub/app/service"
 )
 
@@ -12,11 +12,11 @@ type ReviewController struct {
 }
 
 // 列表
-func (this *ReviewController) List() {
-	status, _ := this.GetInt("status")
-	page, _ := this.GetInt("page")
-	startDate := this.GetString("start_date")
-	endDate := this.GetString("end_date")
+func (c *ReviewController) List() {
+	status, _ := c.GetInt("status")
+	page, _ := c.GetInt("page")
+	startDate := c.GetString("start_date")
+	endDate := c.GetString("end_date")
 
 	if page < 1 {
 		page = 1
@@ -34,7 +34,7 @@ func (this *ReviewController) List() {
 		filter = append(filter, "end_date", endDate)
 	}
 
-	list, count := service.TaskService.GetList(page, this.pageSize, filter...)
+	list, count := service.TaskService.GetList(page, c.pageSize, filter...)
 	envList := make(map[int]*entity.Env)
 	for k, v := range list {
 		if _, ok := envList[v.PubEnvId]; !ok {
@@ -43,57 +43,57 @@ func (this *ReviewController) List() {
 		list[k].EnvInfo = envList[v.PubEnvId]
 	}
 
-	this.Data["pageTitle"] = "审批列表"
-	this.Data["status"] = status
-	this.Data["count"] = count
-	this.Data["list"] = list
-	this.Data["pageBar"] = libs.NewPager(page, int(count), this.pageSize, beego.URLFor("ReviewController.List", "status", status, "start_date", startDate, "end_date", endDate), true).ToString()
-	this.Data["startDate"] = startDate
-	this.Data["endDate"] = endDate
-	this.display()
+	c.Data["pageTitle"] = "审批列表"
+	c.Data["status"] = status
+	c.Data["count"] = count
+	c.Data["list"] = list
+	c.Data["pageBar"] = utils.NewPager(page, int(count), c.pageSize, beego.URLFor("ReviewController.List", "status", status, "start_date", startDate, "end_date", endDate), true).ToString()
+	c.Data["startDate"] = startDate
+	c.Data["endDate"] = endDate
+	c.display()
 }
 
 // 审批
-func (this *ReviewController) Review() {
-	id, _ := this.GetInt("id")
+func (c *ReviewController) Review() {
+	id, _ := c.GetInt("id")
 
-	if this.isPost() {
-		status, _ := this.GetInt("status")
-		message := this.GetString("message")
-		err := service.TaskService.ReviewTask(id, this.userId, status, message)
-		this.checkError(err)
-		service.ActionService.Add("review_task", this.auth.GetUserName(), "task", id, this.GetString("status"))
-		this.redirect(beego.URLFor("ReviewController.List"))
+	if c.isPost() {
+		status, _ := c.GetInt("status")
+		message := c.GetString("message")
+		err := service.TaskService.ReviewTask(id, c.userId, status, message)
+		c.checkError(err)
+		service.ActionService.Add("review_task", c.auth.GetUserName(), "task", id, c.GetString("status"))
+		c.redirect(beego.URLFor("ReviewController.List"))
 	}
 
 	task, err := service.TaskService.GetTask(id)
-	this.checkError(err)
+	c.checkError(err)
 	env, err := service.EnvService.GetEnv(task.PubEnvId)
-	this.checkError(err)
+	c.checkError(err)
 
-	this.Data["pageTitle"] = "审批发布单"
-	this.Data["env"] = env
-	this.Data["task"] = task
-	this.display()
+	c.Data["pageTitle"] = "审批发布单"
+	c.Data["env"] = env
+	c.Data["task"] = task
+	c.display()
 }
 
 // 详情
-func (this *ReviewController) Detail() {
-	id, _ := this.GetInt("id")
+func (c *ReviewController) Detail() {
+	id, _ := c.GetInt("id")
 
 	task, err := service.TaskService.GetTask(id)
-	this.checkError(err)
+	c.checkError(err)
 	env, err := service.EnvService.GetEnv(task.PubEnvId)
-	this.checkError(err)
+	c.checkError(err)
 	review, err := service.TaskService.GetReviewInfo(id)
 	if err != nil {
-		this.showMsg("审批记录不存在。", MSG_ERR)
+		c.showMsg("审批记录不存在。", MSG_ERR)
 	}
 
-	this.Data["pageTitle"] = "浏览详情"
-	this.Data["env"] = env
-	this.Data["task"] = task
-	this.Data["review"] = review
-	this.Data["refer"] = this.Ctx.Request.Referer()
-	this.display()
+	c.Data["pageTitle"] = "浏览详情"
+	c.Data["env"] = env
+	c.Data["task"] = task
+	c.Data["review"] = review
+	c.Data["refer"] = c.Ctx.Request.Referer()
+	c.display()
 }
