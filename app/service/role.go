@@ -27,9 +27,9 @@ func (s *roleService) GetRole(id int) (*entity.Role, error) {
 // 根据名称获取角色
 func (s *roleService) GetRoleByName(roleName string) (*entity.Role, error) {
     role := &entity.Role{
-        RoleName: roleName,
+        Name: roleName,
     }
-    if err := o.Read(role, "RoleName"); err != nil {
+    if err := o.Read(role, "Name"); err != nil {
         return nil, err
     }
     s.loadRoleExtra(role)
@@ -42,7 +42,7 @@ func (s *roleService) loadRoleExtra(role *entity.Role) {
 
 // 添加角色
 func (s *roleService) AddRole(role *entity.Role) error {
-    if _, err := s.GetRoleByName(role.RoleName); err == nil {
+    if _, err := s.GetRoleByName(role.Name); err == nil {
         return errors.New("角色已存在")
     }
     _, err := o.Insert(role)
@@ -62,7 +62,7 @@ func (s *roleService) GetAllRoles() ([]entity.Role, error) {
 
 // 更新角色信息
 func (s *roleService) UpdateRole(role *entity.Role, fields ...string) error {
-    if v, err := s.GetRoleByName(role.RoleName); err == nil && v.Id != role.Id {
+    if v, err := s.GetRoleByName(role.Name); err == nil && v.Id != role.Id {
         return errors.New("角色名称已存在")
     }
     _, err := o.Update(role, fields...)

@@ -30,7 +30,7 @@
 							<td>{{date $v.LastLogin "Y-m-d H:i:s"}}</td>
 							<td>
 							{{range $kk, $role := $v.RoleList}}
-								<span class="label label-white middle">{{$role.RoleName}}</span>
+								<span class="label label-white middle">{{$role.Name}}</span>
 							{{end}}
 							</td>
 							<td>

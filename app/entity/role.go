@@ -7,7 +7,7 @@ import (
 // 角色
 type Role struct {
     Id          int
-    RoleName    string           // 角色名称
+    Name    string           // 角色名称
     ProjectIds  string           // 项目权限
     Description string           // 说明
     CreateTime  time.Time        // 创建时间

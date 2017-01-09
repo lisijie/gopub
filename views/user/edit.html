@@ -15,7 +15,7 @@
 		<div class="col-sm-4">
 			<select multiple="" name="role_ids" class="chosen-select form-control" id="role_ids" data-placeholder="选择角色...">
 				{{range $k,$v := .roleList}}
-				<option value="{{$v.Id}}" {{map_get $.chkmap $v.Id}}>{{$v.RoleName}}</option>
+				<option value="{{$v.Id}}" {{map_get $.chkmap $v.Id}}>{{$v.Name}}</option>
 				{{end}}
 			</select>
 

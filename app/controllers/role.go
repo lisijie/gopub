@@ -25,9 +25,9 @@ func (c *RoleController) List() {
 func (c *RoleController) Add() {
 	if c.isPost() {
 		role := &entity.Role{}
-		role.RoleName = c.GetString("role_name")
+		role.Name = c.GetString("role_name")
 		role.Description = c.GetString("description")
-		if role.RoleName == "" {
+		if role.Name == "" {
 			c.showMsg("角色名不能为空", MSG_ERR)
 		}
 		err := service.RoleService.AddRole(role)
@@ -44,9 +44,9 @@ func (c *RoleController) Edit() {
 	c.checkError(err)
 
 	if c.isPost() {
-		role.RoleName = c.GetString("role_name")
+		role.Name = c.GetString("role_name")
 		role.Description = c.GetString("description")
-		err := service.RoleService.UpdateRole(role, "RoleName", "Description")
+		err := service.RoleService.UpdateRole(role, "Name", "Description")
 		c.checkError(err)
 		c.redirect(beego.URLFor("RoleController.List"))
 	}

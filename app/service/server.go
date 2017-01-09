@@ -3,6 +3,7 @@ package service
 import (
     "errors"
     "github.com/lisijie/gopub/app/entity"
+    "time"
 )
 
 const (
@@ -73,6 +74,8 @@ func (s *serverService) GetAgentList(page, pageSize int) ([]entity.Server, error
 // 添加服务器
 func (s *serverService) AddServer(server *entity.Server) error {
     server.Id = 0
+    server.CreateTime = time.Now()
+    server.UpdateTime = time.Now()
     if o.Read(server, "ip"); server.Id > 0 {
         return errors.New("服务器IP已存在:" + server.Ip)
     }
@@ -82,6 +85,8 @@ func (s *serverService) AddServer(server *entity.Server) error {
 
 // 修改服务器信息
 func (s *serverService) UpdateServer(server *entity.Server, fields ...string) error {
+    server.UpdateTime = time.Now()
+    fields = append(fields, "UpdateTime")
     _, err := o.Update(server, fields...)
     return err
 }
