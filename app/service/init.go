@@ -96,6 +96,10 @@ func debug(v ...interface{}) {
     beego.Debug(v...)
 }
 
+func trace(v ...interface{}) {
+    beego.Trace(v ...)
+}
+
 // 任务单根目录
 func GetTasksBasePath() string {
     return fmt.Sprintf(beego.AppConfig.String("data_dir") + "/tasks")

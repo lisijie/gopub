@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.0.1"
+const VERSION = "3.0.0"
 
 func main() {
 	service.Init()
