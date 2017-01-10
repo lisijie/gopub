@@ -1,0 +1,143 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "KhZ5s0Dt7RoFLhd4uVVPsHjaNfo=",
+			"path": "github.com/Unknwon/goconfig",
+			"revision": "87a46d97951ee1ea20ed3b24c25646a79e87ba5d",
+			"revisionTime": "2016-11-21T22:43:40Z"
+		},
+		{
+			"checksumSHA1": "tPTkYfIh9eqyL2Yb+B/ReA4B2E0=",
+			"path": "github.com/astaxie/beego",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "ntFfzRbMb1fzrIENnFN00ANDFLs=",
+			"path": "github.com/astaxie/beego/config",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "s+gj1rES9SvvCIyF8W2tzlziSPE=",
+			"path": "github.com/astaxie/beego/context",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "PDNn16w89zWODshT9zlPzSmWZFA=",
+			"path": "github.com/astaxie/beego/grace",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "bsSuj8Nf6TdZk8TxnogpSmk7eX0=",
+			"path": "github.com/astaxie/beego/logs",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "/uOgPz2Hs2HaqcfRZdj//ONQpoM=",
+			"path": "github.com/astaxie/beego/orm",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "fMwzAGPXXCLFJV4zBIJD+DBAa08=",
+			"path": "github.com/astaxie/beego/session",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "rxxln8GHFToVnaEJz4JMv0WbaKc=",
+			"path": "github.com/astaxie/beego/toolbox",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "95wt85GTZG0zi3Zk8g2jOVFV6Zg=",
+			"path": "github.com/astaxie/beego/utils",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "lQ4PUWdKDGHHK9hgwRv0USTHkBI=",
+			"path": "github.com/astaxie/beego/validation",
+			"revision": "90999717dda6193c6f970eec52e289b0a9e74998",
+			"revisionTime": "2016-12-05T15:14:26Z"
+		},
+		{
+			"checksumSHA1": "C23LbWdLxzTaK30oTi3ZvYM2hdo=",
+			"path": "github.com/beego/i18n",
+			"revision": "e9308947f407a24aaa1e7dbe35a01931e99cb255",
+			"revisionTime": "2016-11-01T13:27:42Z"
+		},
+		{
+			"checksumSHA1": "QD6LqgLz2JMxXqns8TaxtK9AuHs=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "2e00b5cd70399450106cec6431c2e2ce3cae5034",
+			"revisionTime": "2016-12-24T12:10:19Z"
+		},
+		{
+			"checksumSHA1": "KQhA4EQp4Ldwj9nJZnEURlE6aQw=",
+			"path": "github.com/kr/fs",
+			"revision": "2788f0dbd16903de03cb8186e5c7d97b69ad387b",
+			"revisionTime": "2013-11-06T22:25:44Z"
+		},
+		{
+			"checksumSHA1": "WbBylifp2pvMsdjSUVOutC7wxdc=",
+			"path": "github.com/lisijie/gomail",
+			"revision": "fbb71ddc63acd07dd0ed49ababdf02c551e2539a",
+			"revisionTime": "2015-12-12T16:01:51Z"
+		},
+		{
+			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"path": "github.com/pkg/errors",
+			"revision": "248dadf4e9068a0b3e79f02ed0a610d935de5302",
+			"revisionTime": "2016-10-29T09:36:37Z"
+		},
+		{
+			"checksumSHA1": "7f6MBBq5WfLR9Z8saiCTNKM3ycA=",
+			"path": "github.com/pkg/sftp",
+			"revision": "e59687e8fa2ed36b4c997df28621fb8720ffc767",
+			"revisionTime": "2017-01-07T20:20:37Z"
+		},
+		{
+			"checksumSHA1": "dwOedwBJ1EIK9+S3t108Bx054Y8=",
+			"path": "golang.org/x/crypto/curve25519",
+			"revision": "1d77d5bd477a5879ed443a73e11a1a3dd9616d03",
+			"revisionTime": "2017-01-10T02:12:51Z"
+		},
+		{
+			"checksumSHA1": "wGb//LjBPNxYHqk+dcLo7BjPXK8=",
+			"path": "golang.org/x/crypto/ed25519",
+			"revision": "1d77d5bd477a5879ed443a73e11a1a3dd9616d03",
+			"revisionTime": "2017-01-10T02:12:51Z"
+		},
+		{
+			"checksumSHA1": "LXFcVx8I587SnWmKycSDEq9yvK8=",
+			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"revision": "1d77d5bd477a5879ed443a73e11a1a3dd9616d03",
+			"revisionTime": "2017-01-10T02:12:51Z"
+		},
+		{
+			"checksumSHA1": "RnJfaFwKpC0h06J2MZ8UZX2eohc=",
+			"path": "golang.org/x/crypto/ssh",
+			"revision": "1d77d5bd477a5879ed443a73e11a1a3dd9616d03",
+			"revisionTime": "2017-01-10T02:12:51Z"
+		},
+		{
+			"checksumSHA1": "6IzzHO9p32aHJhMYMwijccDUIVA=",
+			"path": "gopkg.in/alexcesaro/quotedprintable.v3",
+			"revision": "2caba252f4dc53eaf6b553000885530023f54623",
+			"revisionTime": "2015-07-16T17:19:45Z"
+		}
+	],
+	"rootPath": "github.com/lisijie/gopub"
+}
