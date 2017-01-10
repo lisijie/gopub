@@ -12,7 +12,7 @@ import (
 
 var (
     o orm.Ormer
-    tablePrefix string             // 表前缀
+    tablePrefix string                    // 表前缀
     UserService       *userService       // 用户服务
     RoleService       *roleService       // 角色服务
     EnvService        *envService        // 发布环境服务
@@ -22,7 +22,8 @@ var (
     TaskService       *taskService       // 任务服务
     DeployService     *deployService     // 部署服务
     SystemService     *systemService
-    ActionService     *actionService // 系统动态
+    ActionService     *actionService     // 系统动态
+    BuildService      *buildService      // 构建服务
 )
 
 func Init() {
@@ -85,6 +86,7 @@ func initService() {
     DeployService = &deployService{}
     SystemService = &systemService{}
     ActionService = &actionService{}
+    BuildService = &buildService{}
 }
 
 // 返回真实表名

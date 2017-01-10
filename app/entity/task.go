@@ -18,7 +18,8 @@ type Task struct {
     BuildStatus  int                // 构建状态
     ChangeLogs   string             // 修改日志列表
     ChangeFiles  string             // 修改文件列表
-    Filepath     string             // 更新包路径
+    FilePath     string             // 更新包路径
+    ScriptPath   string             // 发布脚本路径
     PubEnvId     int                // 发布环境ID
     PubStatus    int                // 发布状态：1 正在发布，2 发布到跳板机，3 发布到目标服务器，-2 发布到跳板机失败，-3 发布到目标服务器失败
     PubTime      time.Time          // 发布时间

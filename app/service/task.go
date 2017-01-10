@@ -100,6 +100,10 @@ func (s *taskService) AddTask(task *entity.Task) error {
 
 // 更新任务信息
 func (s *taskService) UpdateTask(task *entity.Task, fields ...string) error {
+    task.UpdateTime = time.Now()
+    if len(fields) > 0 {
+        fields = append(fields, "UpdateTime")
+    }
     _, err := o.Update(task, fields...)
     return err
 }
@@ -118,7 +122,7 @@ func (s *taskService) DeleteTask(taskId int) error {
 
 // 构建发布包
 func (s *taskService) BuildTask(task *entity.Task) {
-    err := DeployService.Build(task)
+    err := BuildService.BuildTask(task)
     if err != nil {
         task.BuildStatus = -1
         task.ErrorMsg = err.Error()

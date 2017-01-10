@@ -5,17 +5,38 @@ import (
     "github.com/astaxie/beego"
     "github.com/lisijie/gopub/app/entity"
     "github.com/lisijie/gopub/app/libs/utils"
+    "github.com/lisijie/gopub/app/libs/ssh"
     "html"
-    "os"
-    "path/filepath"
     "strings"
     "time"
+    "path/filepath"
 )
 
+/**
+ * 发布流程：
+ * 1. 打包更新包
+ * 2. 生成跳板机同步脚本
+ * 3. 把更新包和同步脚本拷贝到跳板机
+ * 4. 在跳板机备份旧版本代码
+ * 5. 把更新包更新到跳板机项目目录
+ * 6. 执行同步脚本，rsync把跳板机的项目目录同步到所有机器
+ *
+ * 跳板机上面的目录结构如下：
+ * |- workspace
+ * |	|- www.test.com
+ * |	|	|- www_root
+ * |	|	|- tasks
+ * |	|	|	|- task-1
+ * |	|	|	|	|- publish.sh
+ * |	|	|	|	|- backup
+ * |	|	|	|	|- ver1.0-1.1.tar.gz
+ *
+ *
+ */
 type deployService struct{}
 
 // 执行部署任务
-func (s *deployService) DeployTask(taskId int) error {
+func (s deployService) DeployTask(taskId int) error {
     task, err := TaskService.GetTask(taskId)
     if err != nil {
         return err
@@ -33,11 +54,9 @@ func (s *deployService) DeployTask(taskId int) error {
     return nil
 }
 
-func (s *deployService) doDeploy(task *entity.Task) {
-    job := NewDeployJob(task)
-
+func (s deployService) doDeploy(task *entity.Task) {
     // 1. 发布到跳板机
-    err := job.PubToAgent()
+    err := s.syncToAgent(task)
     if err != nil {
         task.ErrorMsg = fmt.Sprintf("发布到跳板机失败：%v", err)
         task.PubStatus = -2
@@ -49,7 +68,7 @@ func (s *deployService) doDeploy(task *entity.Task) {
     // 2. 发布到目标服务器
     task.ErrorMsg = ""
     task.PubStatus = 2
-    ret, err := job.PubToServer()
+    ret, err := s.syncToServer(task)
     if err != nil {
         task.PubStatus = -3
         task.ErrorMsg = err.Error()
@@ -106,58 +125,69 @@ func (s *deployService) doDeploy(task *entity.Task) {
     }
 }
 
-func (s *deployService) Build(task *entity.Task) error {
-    repo, err := ProjectService.GetRepository(task.ProjectId)
+// 发布到跳板机
+func (s deployService) syncToAgent(task *entity.Task) error {
+    var (
+        err error
+        srcFile string
+        dstFile string
+    )
+    projectInfo, err := ProjectService.GetProject(task.ProjectId)
     if err != nil {
         return err
     }
-    // 获取版本更新信息
-    if task.StartVer != "" {
-        logs, err := repo.GetChangeLogs(task.StartVer, task.EndVer)
-        if err != nil {
-            return fmt.Errorf("获取更新日志失败: %v", err)
-        }
-        files, err := repo.GetChangeFiles(task.StartVer, task.EndVer)
-        if err != nil {
-            return fmt.Errorf("获取更新文件列表失败: %v", err)
-        }
-        task.ChangeLogs = strings.Join(logs, "\n")
-        task.ChangeFiles = strings.Join(files, "\n")
-        TaskService.UpdateTask(task, "ChangeLogs", "ChangeFiles")
-    }
-
-    // 导出目录
-    outDir := GetTaskPath(task.Id)
-    outDir, _ = filepath.Abs(outDir)
-    os.MkdirAll(outDir, 0755)
-
-    // 导出版本号
-    var filename string
-    if task.StartVer == "" {
-        filename = outDir + "/" + task.EndVer + ".tar.gz"
-    } else {
-        filename = outDir + "/" + task.StartVer + "-" + task.EndVer + ".tar.gz"
-    }
-    if utils.FileExists(filename) {
-        os.Remove(filename)
-    }
-
-    // 开始导出
-    if task.StartVer == "" {
-        err = repo.Export(task.EndVer, filename)
-    } else {
-        err = repo.ExportDiffFiles(task.StartVer, task.EndVer, filename)
-    }
+    agentServer, err := ServerService.GetServer(projectInfo.AgentId)
     if err != nil {
-        return fmt.Errorf("导出失败(%s): %v", filename, err)
+        return err
     }
-    task.Filepath = filename
-    TaskService.UpdateTask(task, "Filepath")
+    agentTaskDir := fmt.Sprintf("%s/%s/tasks/task-%d", agentServer.WorkDir, projectInfo.Domain, task.Id)
 
-    job := NewDeployJob(task)
-    if _, err := job.CreateScript(); err != nil {
-        return fmt.Errorf("生成更新脚本失败: %v", err)
+    // 连接到跳板机
+    addr := fmt.Sprintf("%s:%d", agentServer.Ip, agentServer.SshPort)
+    server := ssh.NewServerConn(addr, agentServer.SshUser, agentServer.SshKey)
+    defer server.Close()
+    beego.Debug("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
+
+    // 上传更新包
+    srcFile = task.FilePath
+    dstFile = filepath.Join(agentTaskDir, filepath.Base(task.FilePath))
+    err = server.CopyFile(srcFile, dstFile)
+    beego.Debug("上传更新包: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
+    if err != nil {
+        return err
+    }
+
+    // 上传更新脚本
+    srcFile = task.ScriptPath
+    dstFile = filepath.Join(agentTaskDir, filepath.Base(srcFile))
+    err = server.CopyFile(srcFile, dstFile)
+    beego.Debug("上传更新脚本: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
+    if err != nil {
+        return err
     }
 
     return nil
+}
+
+// 发布到线上服务器
+func (s deployService) syncToServer(task *entity.Task) (string, error) {
+    projectInfo, err := ProjectService.GetProject(task.ProjectId)
+    if err != nil {
+        return "", err
+    }
+    agentServer, err := ServerService.GetServer(projectInfo.AgentId)
+    if err != nil {
+        return "", err
+    }
+    agentTaskDir := fmt.Sprintf("%s/%s/tasks/task-%d", agentServer.WorkDir, projectInfo.Domain, task.Id)
+    // 连接到跳板机
+    addr := fmt.Sprintf("%s:%d", agentServer.Ip, agentServer.SshPort)
+    server := ssh.NewServerConn(addr, agentServer.SshUser, agentServer.SshKey)
+    defer server.Close()
+    debug("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
+    // 执行发布脚本
+    scriptFile := filepath.Join(agentTaskDir, filepath.Base(task.ScriptPath))
+    result, err := server.RunCmd("/bin/bash " + scriptFile)
+    debug("执行发布脚本: ", scriptFile, ", 结果: ", result, ", 错误: ", err)
+    return result, err
 }
