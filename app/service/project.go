@@ -69,7 +69,7 @@ func (s projectService) DeleteProject(projectId int) error {
         return err
     }
     // 删除目录
-    path := GetProjectPath(project.Domain)
+    path := Setting.GetProjectPath(project.Domain)
     os.RemoveAll(path)
     // 环境配置
     if envList, err := EnvService.GetEnvListByProjectId(project.Id); err != nil {
@@ -108,7 +108,7 @@ func (s projectService) GetRepository(projectId int) (repository.Repository, err
         return nil, err
     }
     repo := repository.NewRepository(project.RepoType, &repository.Config{
-        ClonePath: GetProjectPath(project.Domain),
+        ClonePath: Setting.GetProjectPath(project.Domain),
         RemoteUrl: project.RepoUrl,
         Username: project.RepoUser,
         Password: project.RepoPassword,

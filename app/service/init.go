@@ -8,6 +8,7 @@ import (
     "github.com/lisijie/gopub/app/entity"
     "net/url"
     "os"
+    "path/filepath"
 )
 
 var (
@@ -24,7 +25,22 @@ var (
     SystemService     *systemService
     ActionService     *actionService     // 系统动态
     BuildService      *buildService      // 构建服务
+    Setting           *setting           // 系统设置
 )
+
+type setting struct {
+    DataPath        string
+    TaskBasePath    string
+    ProjectBasePath string
+}
+
+func (s setting) GetTaskPath(id int) string {
+    return fmt.Sprintf(s.TaskBasePath + "/task-%d", id)
+}
+
+func (s setting) GetProjectPath(name string) string {
+    return s.ProjectBasePath + "/" + name
+}
 
 func Init() {
     dbHost := beego.AppConfig.String("db.host")
@@ -65,12 +81,9 @@ func Init() {
     }
 
     o = orm.NewOrm()
-    orm.RunCommand()
 
-    // 创建代码
-    os.MkdirAll(GetProjectsBasePath(), 0755)
-    os.MkdirAll(GetTasksBasePath(), 0755)
-
+    // 初始化配置
+    initSetting()
     // 初始化服务对象
     initService()
 }
@@ -89,6 +102,19 @@ func initService() {
     BuildService = &buildService{}
 }
 
+func initSetting() {
+    Setting = &setting{}
+    Setting.DataPath = beego.AppConfig.String("data_dir")
+    if Setting.DataPath == "" {
+        p, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+        Setting.DataPath = filepath.Join(p, "data")
+    }
+    Setting.TaskBasePath = filepath.Join(Setting.DataPath, "tasks")
+    Setting.ProjectBasePath = filepath.Join(Setting.DataPath, "projects")
+    os.MkdirAll(Setting.ProjectBasePath, 0755)
+    os.MkdirAll(Setting.TaskBasePath, 0755)
+}
+
 // 返回真实表名
 func tableName(name string) string {
     return tablePrefix + name
@@ -100,26 +126,6 @@ func debug(v ...interface{}) {
 
 func trace(v ...interface{}) {
     beego.Trace(v ...)
-}
-
-// 任务单根目录
-func GetTasksBasePath() string {
-    return fmt.Sprintf(beego.AppConfig.String("data_dir") + "/tasks")
-}
-
-// 所有项目根目录
-func GetProjectsBasePath() string {
-    return fmt.Sprintf(beego.AppConfig.String("data_dir") + "/projects")
-}
-
-// 任务单目录
-func GetTaskPath(id int) string {
-    return fmt.Sprintf(GetTasksBasePath() + "/task-%d", id)
-}
-
-// 某个项目的代码目录
-func GetProjectPath(name string) string {
-    return GetProjectsBasePath() + "/" + name
 }
 
 func DBVersion() string {

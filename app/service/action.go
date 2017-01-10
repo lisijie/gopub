@@ -3,6 +3,7 @@ package service
 import (
     "fmt"
     "github.com/lisijie/gopub/app/entity"
+    "time"
 )
 
 // 系统动态
@@ -13,15 +14,15 @@ func (s actionService) table() string {
 }
 
 // 添加记录
-func (s actionService) Add(action, actor, objectType string, objectId int, extra string) bool {
+func (s actionService) Add(action, actor, objectType string, objectId int, extra string) (int64, error) {
     act := new(entity.Action)
     act.Action = action
     act.Actor = actor
     act.ObjectType = objectType
     act.ObjectId = objectId
     act.Extra = extra
-    o.Insert(act)
-    return true
+    act.CreateTime = time.Now()
+    return o.Insert(act)
 }
 
 // 登录动态

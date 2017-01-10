@@ -117,7 +117,7 @@ func (s taskService) DeleteTask(taskId int) error {
     if _, err := o.Delete(task); err != nil {
         return err
     }
-    return os.RemoveAll(GetTaskPath(task.Id))
+    return os.RemoveAll(Setting.GetTaskPath(task.Id))
 }
 
 // 构建发布包

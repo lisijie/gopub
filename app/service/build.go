@@ -32,8 +32,7 @@ func (s buildService) BuildTask(task *entity.Task) error {
     }
 
     // 导出目录
-    outDir := GetTaskPath(task.Id)
-    outDir, _ = filepath.Abs(outDir)
+    outDir := Setting.GetTaskPath(task.Id)
     os.MkdirAll(outDir, 0755)
 
     // 导出版本号
@@ -83,7 +82,7 @@ func (s buildService) CreateScript(task *entity.Task) (string, error) {
     if envInfo.ServerCount < 1 {
         return "", fmt.Errorf("服务器列表为空")
     }
-    scriptFilePath := fmt.Sprintf("%s/task-%d/publish.sh", GetTasksBasePath(), task.Id)
+    scriptFilePath := filepath.Join(Setting.GetTaskPath(task.Id), "publish.sh")
     agentTaskDir := fmt.Sprintf("%s/%s/tasks/task-%d", agentServer.WorkDir, projectInfo.Domain, task.Id)
     agentWwwDir := agentServer.WorkDir + "/" + projectInfo.Domain + "/www_root" // 跳板机的项目目录
     agentBackupDir := agentTaskDir + "/backup"                             // 跳板机的备份目录
