@@ -7,7 +7,6 @@ import (
     "syscall"
     "time"
     "os"
-    "gopkg.in/bufio.v1"
 )
 
 // 默认超时时间/秒
@@ -109,7 +108,7 @@ func (c *Command) RunInDirTimeout(dir string, timeout time.Duration) error {
 }
 
 func (c *Command) Dump() string {
-    var buf bufio.Buffer
+    var buf bytes.Buffer
     buf.WriteString(fmt.Sprintf("cmd: %s %s '%s'\n", c.name, c.args[0], c.args[1]))
     buf.WriteString(fmt.Sprintf("pid: %d\n", c.Pid))
     buf.WriteString(fmt.Sprintf("exit: %s\n", c.ProcessState.String()))

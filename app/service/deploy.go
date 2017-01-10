@@ -125,7 +125,9 @@ func (s deployService) doDeploy(task *entity.Task) {
     }
 }
 
-// 发布到跳板机
+// 发布到中转服务器
+// 登录到中转服务器，将发布包和发布脚本拷贝到服务器
+// 当发布包很大时，拷贝时间可能会很长，因此发布系统服务器跟中转服务器最好在同一个内部网
 func (s deployService) syncToAgent(task *entity.Task) error {
     var (
         err error
@@ -170,6 +172,7 @@ func (s deployService) syncToAgent(task *entity.Task) error {
 }
 
 // 发布到线上服务器
+// 登录到中转服务器上执行发布脚本
 func (s deployService) syncToServer(task *entity.Task) (string, error) {
     projectInfo, err := ProjectService.GetProject(task.ProjectId)
     if err != nil {
