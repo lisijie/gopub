@@ -9,12 +9,12 @@ import (
 type projectService struct{}
 
 // 表名
-func (s *projectService) table() string {
+func (s projectService) table() string {
     return tableName("project")
 }
 
 // 获取一个项目信息
-func (s *projectService) GetProject(id int) (*entity.Project, error) {
+func (s projectService) GetProject(id int) (*entity.Project, error) {
     project := &entity.Project{}
     project.Id = id
     if err := o.Read(project); err != nil {
@@ -24,12 +24,12 @@ func (s *projectService) GetProject(id int) (*entity.Project, error) {
 }
 
 // 获取所有项目
-func (s *projectService) GetAllProject() ([]entity.Project, error) {
+func (s projectService) GetAllProject() ([]entity.Project, error) {
     return s.GetList(1, -1)
 }
 
 // 获取项目列表
-func (s *projectService) GetList(page, pageSize int) ([]entity.Project, error) {
+func (s projectService) GetList(page, pageSize int) ([]entity.Project, error) {
     var list []entity.Project
     offset := 0
     if pageSize == -1 {
@@ -46,24 +46,24 @@ func (s *projectService) GetList(page, pageSize int) ([]entity.Project, error) {
 }
 
 // 获取项目总数
-func (s *projectService) GetTotal() (int64, error) {
+func (s projectService) GetTotal() (int64, error) {
     return o.QueryTable(s.table()).Count()
 }
 
 // 添加项目
-func (s *projectService) AddProject(project *entity.Project) error {
+func (s projectService) AddProject(project *entity.Project) error {
     _, err := o.Insert(project)
     return err
 }
 
 // 更新项目信息
-func (s *projectService) UpdateProject(project *entity.Project, fields ...string) error {
+func (s projectService) UpdateProject(project *entity.Project, fields ...string) error {
     _, err := o.Update(project, fields...)
     return err
 }
 
 // 删除一个项目
-func (s *projectService) DeleteProject(projectId int) error {
+func (s projectService) DeleteProject(projectId int) error {
     project, err := s.GetProject(projectId)
     if err != nil {
         return err
@@ -85,7 +85,7 @@ func (s *projectService) DeleteProject(projectId int) error {
 }
 
 // 克隆某个项目的仓库
-func (s *projectService) CloneRepo(projectId int) error {
+func (s projectService) CloneRepo(projectId int) error {
     project, err := s.GetProject(projectId)
     if err != nil {
         return err
@@ -102,7 +102,7 @@ func (s *projectService) CloneRepo(projectId int) error {
     return err
 }
 
-func (s *projectService) GetRepository(projectId int) (repository.Repository, error) {
+func (s projectService) GetRepository(projectId int) (repository.Repository, error) {
     project, err := s.GetProject(projectId)
     if err != nil {
         return nil, err

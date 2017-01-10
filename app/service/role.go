@@ -7,12 +7,12 @@ import (
 
 type roleService struct{}
 
-func (s *roleService) table() string {
+func (s roleService) table() string {
     return tableName("role")
 }
 
 // 根据id获取角色信息
-func (s *roleService) GetRole(id int) (*entity.Role, error) {
+func (s roleService) GetRole(id int) (*entity.Role, error) {
     role := &entity.Role{
         Id: id,
     }
@@ -25,7 +25,7 @@ func (s *roleService) GetRole(id int) (*entity.Role, error) {
 }
 
 // 根据名称获取角色
-func (s *roleService) GetRoleByName(roleName string) (*entity.Role, error) {
+func (s roleService) GetRoleByName(roleName string) (*entity.Role, error) {
     role := &entity.Role{
         Name: roleName,
     }
@@ -36,12 +36,12 @@ func (s *roleService) GetRoleByName(roleName string) (*entity.Role, error) {
     return role, nil
 }
 
-func (s *roleService) loadRoleExtra(role *entity.Role) {
+func (s roleService) loadRoleExtra(role *entity.Role) {
     o.Raw("SELECT SUBSTRING_INDEX(perm, '.', 1) as module,SUBSTRING_INDEX(perm, '.', -1) as `action`, perm AS `key` FROM " + tableName("role_perm") + " WHERE role_id = ?", role.Id).QueryRows(&role.PermList)
 }
 
 // 添加角色
-func (s *roleService) AddRole(role *entity.Role) error {
+func (s roleService) AddRole(role *entity.Role) error {
     if _, err := s.GetRoleByName(role.Name); err == nil {
         return errors.New("角色已存在")
     }
@@ -50,7 +50,7 @@ func (s *roleService) AddRole(role *entity.Role) error {
 }
 
 // 获取所有角色列表
-func (s *roleService) GetAllRoles() ([]entity.Role, error) {
+func (s roleService) GetAllRoles() ([]entity.Role, error) {
     var (
         roles []entity.Role // 角色列表
     )
@@ -61,7 +61,7 @@ func (s *roleService) GetAllRoles() ([]entity.Role, error) {
 }
 
 // 更新角色信息
-func (s *roleService) UpdateRole(role *entity.Role, fields ...string) error {
+func (s roleService) UpdateRole(role *entity.Role, fields ...string) error {
     if v, err := s.GetRoleByName(role.Name); err == nil && v.Id != role.Id {
         return errors.New("角色名称已存在")
     }
@@ -70,7 +70,7 @@ func (s *roleService) UpdateRole(role *entity.Role, fields ...string) error {
 }
 
 // 设置角色权限
-func (s *roleService) SetPerm(roleId int, perms []string) error {
+func (s roleService) SetPerm(roleId int, perms []string) error {
     if _, err := s.GetRole(roleId); err != nil {
         return err
     }
@@ -94,7 +94,7 @@ func (s *roleService) SetPerm(roleId int, perms []string) error {
 }
 
 // 删除角色
-func (s *roleService) DeleteRole(id int) error {
+func (s roleService) DeleteRole(id int) error {
     role, err := s.GetRole(id)
     if err != nil {
         return err

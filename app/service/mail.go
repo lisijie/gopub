@@ -10,26 +10,26 @@ import (
 
 type mailService struct{}
 
-func (s *mailService) table() string {
+func (s mailService) table() string {
     return tableName("mail_tpl")
 }
 
-func (s *mailService) AddMailTpl(tpl *entity.MailTpl) error {
+func (s mailService) AddMailTpl(tpl *entity.MailTpl) error {
     _, err := o.Insert(tpl)
     return err
 }
 
-func (s *mailService) DelMailTpl(id int) error {
+func (s mailService) DelMailTpl(id int) error {
     _, err := o.QueryTable(s.table()).Filter("id", id).Delete()
     return err
 }
 
-func (s *mailService) SaveMailTpl(tpl *entity.MailTpl) error {
+func (s mailService) SaveMailTpl(tpl *entity.MailTpl) error {
     _, err := o.Update(tpl)
     return err
 }
 
-func (s *mailService) GetMailTpl(id int) (*entity.MailTpl, error) {
+func (s mailService) GetMailTpl(id int) (*entity.MailTpl, error) {
     tpl := &entity.MailTpl{}
     tpl.Id = id
     err := o.Read(tpl)
@@ -37,13 +37,13 @@ func (s *mailService) GetMailTpl(id int) (*entity.MailTpl, error) {
 }
 
 // 获取邮件模板列表
-func (s *mailService) GetMailTplList() ([]entity.MailTpl, error) {
+func (s mailService) GetMailTplList() ([]entity.MailTpl, error) {
     var list []entity.MailTpl
     _, err := o.QueryTable(s.table()).OrderBy("-id").All(&list)
     return list, err
 }
 
-func (s *mailService)  SendMail(subject, content string, to, cc []string) error {
+func (s mailService)  SendMail(subject, content string, to, cc []string) error {
     host := beego.AppConfig.String("mail.host")
     port, _ := beego.AppConfig.Int("mail.port")
     username := beego.AppConfig.String("mail.user")

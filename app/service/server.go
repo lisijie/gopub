@@ -14,16 +14,16 @@ const (
 type serverService struct{}
 
 // 表名
-func (s *serverService) table() string {
+func (s serverService) table() string {
     return tableName("server")
 }
 
-func (s *serverService) GetTotal(typeId int) (int64, error) {
+func (s serverService) GetTotal(typeId int) (int64, error) {
     return o.QueryTable(s.table()).Filter("TypeId", typeId).Count()
 }
 
 // 获取一个服务器信息
-func (s *serverService) GetServer(id int, types ...int) (*entity.Server, error) {
+func (s serverService) GetServer(id int, types ...int) (*entity.Server, error) {
     var err error
     server := &entity.Server{}
     server.Id = id
@@ -36,7 +36,7 @@ func (s *serverService) GetServer(id int, types ...int) (*entity.Server, error) 
 }
 
 // 根据id列表获取记录
-func (s *serverService) GetListByIds(ids []int) ([]entity.Server, error) {
+func (s serverService) GetListByIds(ids []int) ([]entity.Server, error) {
     var list []entity.Server
     if len(ids) == 0 {
         return nil, errors.New("ids不能为空")
@@ -50,7 +50,7 @@ func (s *serverService) GetListByIds(ids []int) ([]entity.Server, error) {
 }
 
 // 获取普通服务器列表
-func (s *serverService) GetServerList(page, pageSize int) ([]entity.Server, error) {
+func (s serverService) GetServerList(page, pageSize int) ([]entity.Server, error) {
     var list []entity.Server
     qs := o.QueryTable(s.table()).Filter("TypeId", SERVER_TYPE_NORMAL)
     if pageSize > 0 {
@@ -61,7 +61,7 @@ func (s *serverService) GetServerList(page, pageSize int) ([]entity.Server, erro
 }
 
 // 获取跳板服务器列表
-func (s *serverService) GetAgentList(page, pageSize int) ([]entity.Server, error) {
+func (s serverService) GetAgentList(page, pageSize int) ([]entity.Server, error) {
     var list []entity.Server
     qs := o.QueryTable(s.table()).Filter("TypeId", SERVER_TYPE_AGENT)
     if pageSize > 0 {
@@ -72,7 +72,7 @@ func (s *serverService) GetAgentList(page, pageSize int) ([]entity.Server, error
 }
 
 // 添加服务器
-func (s *serverService) AddServer(server *entity.Server) error {
+func (s serverService) AddServer(server *entity.Server) error {
     server.Id = 0
     server.CreateTime = time.Now()
     server.UpdateTime = time.Now()
@@ -84,15 +84,17 @@ func (s *serverService) AddServer(server *entity.Server) error {
 }
 
 // 修改服务器信息
-func (s *serverService) UpdateServer(server *entity.Server, fields ...string) error {
+func (s serverService) UpdateServer(server *entity.Server, fields ...string) error {
     server.UpdateTime = time.Now()
-    fields = append(fields, "UpdateTime")
+    if len(fields) > 0 {
+        fields = append(fields, "UpdateTime")
+    }
     _, err := o.Update(server, fields...)
     return err
 }
 
 // 删除服务器
-func (s *serverService) DeleteServer(id int) error {
+func (s serverService) DeleteServer(id int) error {
     _, err := o.QueryTable(s.table()).Filter("id", id).Delete()
     if err != nil {
         return err

@@ -6,7 +6,7 @@ import (
 
 type systemService struct{}
 
-func (s *systemService) GetPermList() map[string][]entity.Perm {
+func (s systemService) GetPermList() map[string][]entity.Perm {
     var list []entity.Perm
     o.Raw("SELECT * FROM " + tableName("perm")).QueryRows(&list)
 

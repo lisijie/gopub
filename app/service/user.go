@@ -4,16 +4,17 @@ import (
     "errors"
     "github.com/lisijie/gopub/app/entity"
     "github.com/lisijie/gopub/app/libs/utils"
+    "time"
 )
 
 type userService struct{}
 
-func (s *userService) table() string {
+func (s userService) table() string {
     return tableName("user")
 }
 
 // 根据用户id获取一个用户信息
-func (s *userService) GetUser(userId int, getRoleInfo bool) (*entity.User, error) {
+func (s userService) GetUser(userId int, getRoleInfo bool) (*entity.User, error) {
     user := &entity.User{}
     user.Id = userId
 
@@ -25,7 +26,7 @@ func (s *userService) GetUser(userId int, getRoleInfo bool) (*entity.User, error
 }
 
 // 根据用户名获取用户信息
-func (s *userService) GetUserByName(userName string) (*entity.User, error) {
+func (s userService) GetUserByName(userName string) (*entity.User, error) {
     user := &entity.User{}
     user.UserName = userName
     err := o.Read(user, "UserName")
@@ -33,12 +34,12 @@ func (s *userService) GetUserByName(userName string) (*entity.User, error) {
 }
 
 // 获取用户总数
-func (s *userService) GetTotal() (int64, error) {
+func (s userService) GetTotal() (int64, error) {
     return o.QueryTable(s.table()).Count()
 }
 
 // 分页获取用户列表
-func (s *userService) GetUserList(page, pageSize int, getRoleInfo bool) ([]entity.User, error) {
+func (s userService) GetUserList(page, pageSize int, getRoleInfo bool) ([]entity.User, error) {
     offset := (page - 1) * pageSize
     if offset < 0 {
         offset = 0
@@ -55,7 +56,7 @@ func (s *userService) GetUserList(page, pageSize int, getRoleInfo bool) ([]entit
 }
 
 // 根据角色id获取用户列表
-func (s *userService) GetUserListByRoleId(roleId int) ([]entity.User, error) {
+func (s userService) GetUserListByRoleId(roleId int) ([]entity.User, error) {
     var users []entity.User
     sql := "SELECT u.* FROM " + s.table() + " u JOIN " + tableName("user_role") + " r ON u.id = r.user_id WHERE r.role_id = ?"
     _, err := o.Raw(sql, roleId).QueryRows(&users)
@@ -64,7 +65,7 @@ func (s *userService) GetUserListByRoleId(roleId int) ([]entity.User, error) {
 
 // 获取某个用户的角色列表
 // 为什么不直接连表查询role表？因为不想“越权”查询
-func (s *userService) GetUserRoleList(userId int) ([]entity.Role, error) {
+func (s userService) GetUserRoleList(userId int) ([]entity.Role, error) {
     var (
         roleRef  []entity.UserRole
         roleList []entity.Role
@@ -82,45 +83,46 @@ func (s *userService) GetUserRoleList(userId int) ([]entity.Role, error) {
 }
 
 // 添加用户
-func (s *userService) AddUser(userName, email, password string, sex int) (*entity.User, error) {
+func (s userService) AddUser(userName, email, password string, sex int) (*entity.User, error) {
     if exists, _ := s.GetUserByName(userName); exists.Id > 0 {
         return nil, errors.New("用户名已存在")
     }
-
     user := &entity.User{}
     user.UserName = userName
     user.Sex = sex
     user.Email = email
     user.Salt = string(utils.RandomCreateBytes(10))
     user.Password = utils.Md5([]byte(password + user.Salt))
-    // user.LastLogin = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
     _, err := o.Insert(user)
     return user, err
 }
 
 // 更新用户信息
-func (this *userService) UpdateUser(user *entity.User, fileds ...string) error {
-    if len(fileds) < 1 {
+func (s userService) UpdateUser(user *entity.User, fields ...string) error {
+    if len(fields) < 1 {
         return errors.New("更新字段不能为空")
     }
-    _, err := o.Update(user, fileds...)
+    user.UpdateTime = time.Now()
+    fields = append(fields, "UpdateTime")
+    _, err := o.Update(user, fields...)
     return err
 }
 
 // 修改密码
-func (s *userService) ModifyPassword(userId int, password string) error {
+func (s userService) ModifyPassword(userId int, password string) error {
     user, err := s.GetUser(userId, false)
     if err != nil {
         return err
     }
     user.Salt = string(utils.RandomCreateBytes(10))
     user.Password = utils.Md5([]byte(password + user.Salt))
-    _, err = o.Update(user, "Salt", "Password")
+    user.UpdateTime = time.Now()
+    _, err = o.Update(user, "Salt", "Password", "UpdateTime")
     return err
 }
 
 // 删除用户
-func (s *userService) DeleteUser(userId int) error {
+func (s userService) DeleteUser(userId int) error {
     if userId == 1 {
         return errors.New("不允许删除用户ID为1的用户")
     }
@@ -132,7 +134,7 @@ func (s *userService) DeleteUser(userId int) error {
 }
 
 // 设置用户角色
-func (s *userService) UpdateUserRoles(userId int, roleIds []int) error {
+func (s userService) UpdateUserRoles(userId int, roleIds []int) error {
     if _, err := s.GetUser(userId, false); err != nil {
         return err
     }

@@ -11,18 +11,18 @@ import (
 
 type taskService struct{}
 
-func (s *taskService) table() string {
+func (s taskService) table() string {
     return tableName("task")
 }
 
 // 删除某个项目下的而所有发布任务
-func (s *taskService) DeleteByProjectId(projectId int) error {
+func (s taskService) DeleteByProjectId(projectId int) error {
     _, err := o.QueryTable(s.table()).Filter("project_id", projectId).Delete()
     return err
 }
 
 // 获取一个任务信息
-func (s *taskService) GetTask(id int) (*entity.Task, error) {
+func (s taskService) GetTask(id int) (*entity.Task, error) {
     task := &entity.Task{}
     task.Id = id
     if err := o.Read(task); err != nil {
@@ -33,7 +33,7 @@ func (s *taskService) GetTask(id int) (*entity.Task, error) {
 }
 
 // 获取任务单列表
-func (s *taskService) GetList(page, pageSize int, filters ...interface{}) ([]entity.Task, int64) {
+func (s taskService) GetList(page, pageSize int, filters ...interface{}) ([]entity.Task, int64) {
     var (
         list  []entity.Task
         count int64
@@ -79,7 +79,7 @@ func (s *taskService) GetList(page, pageSize int, filters ...interface{}) ([]ent
 }
 
 // 添加任务
-func (s *taskService) AddTask(task *entity.Task) error {
+func (s taskService) AddTask(task *entity.Task) error {
     if _, err := EnvService.GetEnv(task.PubEnvId); err != nil {
         return fmt.Errorf("获取环境信息失败: %s", err.Error())
     }
@@ -99,7 +99,7 @@ func (s *taskService) AddTask(task *entity.Task) error {
 }
 
 // 更新任务信息
-func (s *taskService) UpdateTask(task *entity.Task, fields ...string) error {
+func (s taskService) UpdateTask(task *entity.Task, fields ...string) error {
     task.UpdateTime = time.Now()
     if len(fields) > 0 {
         fields = append(fields, "UpdateTime")
@@ -109,7 +109,7 @@ func (s *taskService) UpdateTask(task *entity.Task, fields ...string) error {
 }
 
 // 删除任务
-func (s *taskService) DeleteTask(taskId int) error {
+func (s taskService) DeleteTask(taskId int) error {
     task, err := s.GetTask(taskId)
     if err != nil {
         return err
@@ -121,7 +121,7 @@ func (s *taskService) DeleteTask(taskId int) error {
 }
 
 // 构建发布包
-func (s *taskService) BuildTask(task *entity.Task) {
+func (s taskService) BuildTask(task *entity.Task) {
     err := BuildService.BuildTask(task)
     if err != nil {
         task.BuildStatus = -1
@@ -134,7 +134,7 @@ func (s *taskService) BuildTask(task *entity.Task) {
 }
 
 // 任务审批
-func (s *taskService) ReviewTask(taskId, userId, status int, message string) error {
+func (s taskService) ReviewTask(taskId, userId, status int, message string) error {
     if status != 1 && status != -1 {
         return fmt.Errorf("审批状态无效: %d", status)
     }
@@ -161,19 +161,19 @@ func (s *taskService) ReviewTask(taskId, userId, status int, message string) err
 }
 
 // 获取审批信息
-func (s *taskService) GetReviewInfo(taskId int) (*entity.TaskReview, error) {
+func (s taskService) GetReviewInfo(taskId int) (*entity.TaskReview, error) {
     review := new(entity.TaskReview)
     err := o.QueryTable(tableName("task_review")).Filter("task_id", taskId).OrderBy("-id").Limit(1).One(review)
     return review, err
 }
 
 // 获取已发布任务总数
-func (s *taskService) GetPubTotal() (int64, error) {
+func (s taskService) GetPubTotal() (int64, error) {
     return o.QueryTable(s.table()).Filter("pub_status", 3).Count()
 }
 
 // 发布统计
-func (s *taskService) GetPubStat(rangeType string) map[int]int {
+func (s taskService) GetPubStat(rangeType string) map[int]int {
     var sql string
     var maps []orm.Params
 
@@ -213,7 +213,7 @@ func (s *taskService) GetPubStat(rangeType string) map[int]int {
     return result
 }
 
-func (s *taskService) GetProjectPubStat() []map[string]int {
+func (s taskService) GetProjectPubStat() []map[string]int {
     var maps []orm.Params
     sql := "SELECT project_id, COUNT(*) AS count FROM " + s.table() + " WHERE pub_status = 3 GROUP BY project_id ORDER BY `count` DESC"
     num, err := o.Raw(sql).Values(&maps)
