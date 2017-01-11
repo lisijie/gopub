@@ -42,22 +42,30 @@ func (r *GitRepository) GetTags() ([]string, error) {
     if err != nil {
         return nil, err
     }
-    return strings.Split(string(cmd.Stdout()), "\n"), nil
+    tags := make([]string, 0)
+    for _, v := range strings.Split(string(cmd.Stdout()), "\n") {
+        v = strings.TrimSpace(v)
+        if v != "" {
+            tags = append(tags, v)
+        }
+    }
+    return tags, nil
 }
 
 func (r *GitRepository) GetBranches() ([]string, error) {
-    cmd := command.NewCommand("git branch --no-color")
+    cmd := command.NewCommand("git show-ref --heads")
     if err := cmd.RunInDir(r.Path); err != nil {
         return nil, err
     }
     out := string(cmd.Stdout())
     lines := strings.Split(out, "\n")
     branches := make([]string, 0, len(lines))
+    prefixLen := len("refs/heads/")
     for _, v := range lines {
-        if v == "" || strings.Contains(v, " -> ") {
-            continue
+        fields := strings.Fields(strings.TrimSpace(v))
+        if len(fields) == 2 {
+            branches = append(branches, fields[1][prefixLen:])
         }
-        branches = append(branches, strings.SplitN(v, "/", 2)[1])
     }
     return branches, nil
 }
