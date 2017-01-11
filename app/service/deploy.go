@@ -146,7 +146,12 @@ func (s deployService) syncToAgent(task *entity.Task) error {
 
     // 连接到跳板机
     addr := fmt.Sprintf("%s:%d", agentServer.Ip, agentServer.SshPort)
-    server := ssh.NewServerConn(addr, agentServer.SshUser, agentServer.SshKey)
+    server := ssh.NewServerConn(&ssh.Config{
+        Addr:addr,
+        User:agentServer.SshUser,
+        Password:agentServer.SshPwd,
+        Key:agentServer.SshKey,
+    })
     defer server.Close()
     beego.Debug("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
 
@@ -185,7 +190,12 @@ func (s deployService) syncToServer(task *entity.Task) (string, error) {
     agentTaskDir := fmt.Sprintf("%s/%s/tasks/task-%d", agentServer.WorkDir, projectInfo.Domain, task.Id)
     // 连接到跳板机
     addr := fmt.Sprintf("%s:%d", agentServer.Ip, agentServer.SshPort)
-    server := ssh.NewServerConn(addr, agentServer.SshUser, agentServer.SshKey)
+    server := ssh.NewServerConn(&ssh.Config{
+        Addr:addr,
+        User:agentServer.SshUser,
+        Password:agentServer.SshPwd,
+        Key:agentServer.SshKey,
+    })
     defer server.Close()
     debug("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
     // 执行发布脚本

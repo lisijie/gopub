@@ -93,6 +93,8 @@ func (s taskService) AddTask(task *entity.Task) error {
         task.ReviewStatus = 1 // 已审批
     }
     task.PubStatus = 0
+    task.UpdateTime = time.Now()
+    task.CreateTime = time.Now()
     // task.PubTime = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
     _, err = o.Insert(task)
     return err
@@ -152,6 +154,7 @@ func (s taskService) ReviewTask(taskId, userId, status int, message string) erro
     review.UserName = user.UserName
     review.Status = status
     review.Message = message
+    review.CreateTime = time.Now()
     if _, err := o.Insert(review); err != nil {
         return err
     }

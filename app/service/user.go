@@ -93,6 +93,8 @@ func (s userService) AddUser(userName, email, password string, sex int) (*entity
     user.Email = email
     user.Salt = string(utils.RandomCreateBytes(10))
     user.Password = utils.Md5([]byte(password + user.Salt))
+    user.CreateTime = time.Now()
+    user.UpdateTime = time.Now()
     _, err := o.Insert(user)
     return user, err
 }

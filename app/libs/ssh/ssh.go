@@ -12,20 +12,22 @@ import (
     "github.com/lisijie/gopub/app/libs/utils"
 )
 
+type Config struct {
+    Addr        string // 192.168.1.1:22
+    User        string
+    Password    string
+    Key         string
+}
+
 type ServerConn struct {
-    addr       string // 192.168.1.1:22
-    user       string
-    key        string
+    cfg        *Config
     conn       *ssh.Client
     sftpClient *sftp.Client
 }
 
-func NewServerConn(addr, user, key string) *ServerConn {
-    key = utils.RealPath(key)
+func NewServerConn(cfg *Config) *ServerConn {
     return &ServerConn{
-        addr: addr,
-        user: user,
-        key:  key,
+        cfg : cfg,
     }
 }
 
@@ -35,18 +37,21 @@ func (s *ServerConn) getSshConnect() (*ssh.Client, error) {
         return s.conn, nil
     }
     config := ssh.ClientConfig{
-        User: s.user,
+        User: s.cfg.User,
+    }
+    if s.cfg.Key != "" {
+        keys := []ssh.Signer{}
+        if pk, err := readPrivateKey(s.cfg.Key); err == nil {
+            keys = append(keys, pk)
+        }
+        config.Auth = append(config.Auth, ssh.PublicKeys(keys...))
+    } else {
+        config.Auth = append(config.Auth, ssh.Password(s.cfg.Password))
     }
 
-    keys := []ssh.Signer{}
-    if pk, err := readPrivateKey(s.key); err == nil {
-        keys = append(keys, pk)
-    }
-    config.Auth = append(config.Auth, ssh.PublicKeys(keys...))
-
-    conn, err := ssh.Dial("tcp", s.addr, &config)
+    conn, err := ssh.Dial("tcp", s.cfg.Addr, &config)
     if err != nil {
-        return nil, fmt.Errorf("无法连接到服务器 [%s]: %v", s.addr, err)
+        return nil, fmt.Errorf("无法连接到服务器 [%s]: %v", s.cfg.Addr, err)
     }
     s.conn = conn
     return s.conn, nil
@@ -154,6 +159,7 @@ func (s *ServerConn) CopyFile(srcFile, dstFile string) error {
 }
 
 func readPrivateKey(path string) (ssh.Signer, error) {
+    path = utils.RealPath(path)
     f, err := os.Open(path)
     if err != nil {
         return nil, err

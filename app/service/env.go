@@ -3,6 +3,7 @@ package service
 import (
     "github.com/astaxie/beego/orm"
     "github.com/lisijie/gopub/app/entity"
+    "time"
 )
 
 type envService struct{}
@@ -75,6 +76,8 @@ func (s envService) GetEnvServers(envId int) ([]entity.Server, error) {
 // 新增发布环境
 func (s envService) AddEnv(env *entity.Env) error {
     env.ServerCount = len(env.ServerList)
+    env.CreateTime = time.Now()
+    env.UpdateTime = time.Now()
     if _, err := o.Insert(env); err != nil {
         return err
     }
@@ -91,6 +94,7 @@ func (s envService) AddEnv(env *entity.Env) error {
 // 保存环境配置
 func (s envService) SaveEnv(env *entity.Env) error {
     env.ServerCount = len(env.ServerList)
+    env.UpdateTime = time.Now()
     if _, err := o.Update(env); err != nil {
         return err
     }

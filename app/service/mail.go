@@ -6,6 +6,7 @@ import (
     "github.com/astaxie/beego"
     "github.com/lisijie/gopub/app/libs/utils"
     "github.com/lisijie/gomail"
+    "time"
 )
 
 type mailService struct{}
@@ -15,6 +16,8 @@ func (s mailService) table() string {
 }
 
 func (s mailService) AddMailTpl(tpl *entity.MailTpl) error {
+    tpl.CreateTime = time.Now()
+    tpl.UpdateTime = time.Now()
     _, err := o.Insert(tpl)
     return err
 }
@@ -25,6 +28,7 @@ func (s mailService) DelMailTpl(id int) error {
 }
 
 func (s mailService) SaveMailTpl(tpl *entity.MailTpl) error {
+    tpl.UpdateTime = time.Now()
     _, err := o.Update(tpl)
     return err
 }

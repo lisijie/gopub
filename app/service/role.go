@@ -3,6 +3,7 @@ package service
 import (
     "errors"
     "github.com/lisijie/gopub/app/entity"
+    "time"
 )
 
 type roleService struct{}
@@ -45,6 +46,8 @@ func (s roleService) AddRole(role *entity.Role) error {
     if _, err := s.GetRoleByName(role.Name); err == nil {
         return errors.New("角色已存在")
     }
+    role.CreateTime = time.Now()
+    role.UpdateTime = time.Now()
     _, err := o.Insert(role)
     return err
 }
@@ -64,6 +67,10 @@ func (s roleService) GetAllRoles() ([]entity.Role, error) {
 func (s roleService) UpdateRole(role *entity.Role, fields ...string) error {
     if v, err := s.GetRoleByName(role.Name); err == nil && v.Id != role.Id {
         return errors.New("角色名称已存在")
+    }
+    role.UpdateTime = time.Now()
+    if len(fields) > 0 {
+        fields = append(fields, "UpdateTime")
     }
     _, err := o.Update(role, fields...)
     return err

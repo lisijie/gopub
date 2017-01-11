@@ -4,6 +4,12 @@ import (
     "github.com/lisijie/gopub/app/entity"
     "github.com/lisijie/gopub/app/libs/repository"
     "os"
+    "time"
+)
+
+const (
+    REPO_TYPE_GIT = "GIT"
+    REPO_TYPE_SVN = "SVN"
 )
 
 type projectService struct{}
@@ -52,12 +58,21 @@ func (s projectService) GetTotal() (int64, error) {
 
 // 添加项目
 func (s projectService) AddProject(project *entity.Project) error {
+    if project.RepoType == "" {
+        project.RepoType = REPO_TYPE_GIT
+    }
+    project.CreateTime = time.Now()
+    project.UpdateTime = time.Now()
     _, err := o.Insert(project)
     return err
 }
 
 // 更新项目信息
 func (s projectService) UpdateProject(project *entity.Project, fields ...string) error {
+    project.UpdateTime = time.Now()
+    if len(fields) > 0 {
+        fields = append(fields, "UpdateTime")
+    }
     _, err := o.Update(project, fields...)
     return err
 }
