@@ -20,7 +20,7 @@ type Repository interface {
     // 获取修改列表
     GetChangeLogs(fromVer, toVer string) ([]string, error)
 
-    GetChangeFiles(fromVer, toVer string) ([]string, error)
+    GetChangeFiles(fromVer, toVer string) ([]ChangeFile, error)
 
 }
 

@@ -77,7 +77,7 @@ func (r *GitRepository) Export(branch, filename string) error {
 }
 
 func (r *GitRepository) ExportDiffFiles(fromVer, toVer, filename string) error {
-    cmdStr := "git archive --format=tar " + toVer + " $(git diff --name-status -b " + fromVer + " " + toVer + " | grep -v ^D | awk '{print $2}') | gzip > " + filename
+    cmdStr := "git archive --format=tar " + toVer + " $(git diff --name-status -b " + fromVer + "..." + toVer + " | grep -v ^D | awk '{print $2}') | gzip > " + filename
     cmd := command.NewCommand(cmdStr)
     return cmd.RunInDir(r.Path)
 }
@@ -86,6 +86,21 @@ func (r *GitRepository) GetChangeLogs(fromVer, toVer string) ([]string, error) {
     return nil, nil
 }
 
-func (r *GitRepository) GetChangeFiles(fromVer, toVer string) ([]string, error) {
-    return nil, nil
+func (r *GitRepository) GetChangeFiles(fromVer, toVer string) ([]ChangeFile, error) {
+    cmdStr := "git diff --name-status -b " + fromVer + "..." + toVer
+    cmd := command.NewCommand(cmdStr)
+    if err := cmd.RunInDir(r.Path); err != nil {
+        return nil, err
+    }
+    lines := strings.Split(string(cmd.Stdout()), "\n")
+    result := make([]ChangeFile, 0, len(lines))
+    for _, v := range lines {
+        v = strings.TrimSpace(v)
+        if v == "" {
+            continue
+        }
+        fields := strings.Fields(v)
+        result = append(result, ChangeFile{Flag:fields[0], Filename:fields[1]})
+    }
+    return result, nil
 }

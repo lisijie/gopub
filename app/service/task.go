@@ -95,7 +95,6 @@ func (s taskService) AddTask(task *entity.Task) error {
     task.PubStatus = 0
     task.UpdateTime = time.Now()
     task.CreateTime = time.Now()
-    // task.PubTime = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
     _, err = o.Insert(task)
     return err
 }

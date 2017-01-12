@@ -69,15 +69,9 @@ func (c *TaskController) Create() {
         if verType == 2 {
             startVer = ""
         } else {
-            if utils.VerCompare(startVer, endVer) != -1 {
-                c.showMsg("起始版本必须小于结束版本", MSG_ERR)
-            } else {
-                /*
-                repo, _ := service.RepositoryService.GetRepoByProjectId(projectId)
-                if count, _ := repo.GetDiffFileCount(startVer, endVer); count < 1 {
-                    c.showMsg("版本区间 "+startVer+" - "+endVer+" 似乎没有差异文件！", MSG_ERR)
-                }
-                */
+            repo, _ := service.ProjectService.GetRepository(projectId)
+            if files, _ := repo.GetChangeFiles(startVer, endVer); len(files) < 1 {
+                c.showMsg("版本区间 " + startVer + "..." + endVer + " 似乎没有差异文件！", MSG_ERR)
             }
         }
 
@@ -119,16 +113,21 @@ func (c *TaskController) Create() {
     }
 }
 
-// 标签列表
-func (c *TaskController) GetTags() {
+// 列表
+func (c *TaskController) GetRefs() {
     projectId, _ := c.GetInt("project_id")
     repo, err := service.ProjectService.GetRepository(projectId)
     c.checkError(err)
-    list, err := repo.GetTags()
+    err = repo.Update()
+    c.checkError(err)
+    tags, err := repo.GetTags()
+    c.checkError(err)
+    branches, err := repo.GetBranches()
     c.checkError(err)
 
     out := make(map[string]interface{})
-    out["list"] = list
+    out["tags"] = tags
+    out["branches"] = branches
     c.jsonResult(out)
 }
 

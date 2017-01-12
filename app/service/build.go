@@ -7,6 +7,7 @@ import (
     "path/filepath"
     "os"
     "github.com/lisijie/gopub/app/libs/utils"
+    "bytes"
 )
 
 type buildService struct{}
@@ -26,8 +27,12 @@ func (s buildService) BuildTask(task *entity.Task) error {
         if err != nil {
             return fmt.Errorf("获取更新文件列表失败: %v", err)
         }
+        var filesBuf bytes.Buffer
+        for _, v := range files {
+            filesBuf.WriteString(v.Flag + " " + v.Filename + "\n")
+        }
         task.ChangeLogs = strings.Join(logs, "\n")
-        task.ChangeFiles = strings.Join(files, "\n")
+        task.ChangeFiles = filesBuf.String()
         TaskService.UpdateTask(task, "ChangeLogs", "ChangeFiles")
     }
 
