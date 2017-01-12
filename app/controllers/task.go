@@ -221,8 +221,10 @@ func (c *TaskController) StartPub() {
     if !c.auth.HasAccessPerm(c.controllerName, "publish") {
         c.showMsg("您没有执行该操作的权限", MSG_ERR)
     }
-
-    err := service.DeployService.DeployTask(taskId)
+    task, err := service.TaskService.GetTask(taskId)
+    c.checkError(err)
+    dt := service.NewDeployTask(task)
+    err = dt.Deploy()
     c.checkError(err)
 
     service.ActionService.Add("pub_task", c.auth.GetUserName(), "task", taskId, "")

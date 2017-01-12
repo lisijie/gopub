@@ -21,7 +21,6 @@ var (
     ProjectService    *projectService    // 项目服务
     MailService       *mailService       // 邮件服务
     TaskService       *taskService       // 任务服务
-    DeployService     *deployService     // 部署服务
     SystemService     *systemService
     ActionService     *actionService     // 系统动态
     BuildService      *buildService      // 构建服务
@@ -76,7 +75,7 @@ func Init() {
         //new(entity.UserRole),
     )
 
-    if beego.AppConfig.String("runmode") == "dev" {
+    if v, _ := beego.AppConfig.Bool("ormdebug"); v {
         orm.Debug = true
     }
 
@@ -96,7 +95,6 @@ func initService() {
     ProjectService = &projectService{}
     MailService = &mailService{}
     TaskService = &taskService{}
-    DeployService = &deployService{}
     SystemService = &systemService{}
     ActionService = &actionService{}
     BuildService = &buildService{}
