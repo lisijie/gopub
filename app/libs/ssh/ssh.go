@@ -10,13 +10,15 @@ import (
     "os"
     "path"
     "github.com/lisijie/gopub/app/libs/utils"
+    "bufio"
+    "sync"
 )
 
 type Config struct {
-    Addr        string // 192.168.1.1:22
-    User        string
-    Password    string
-    Key         string
+    Addr     string // 192.168.1.1:22
+    User     string
+    Password string
+    Key      string
 }
 
 type ServerConn struct {
@@ -96,7 +98,6 @@ func (s *ServerConn) TryConnect() error {
 
 // 在远程服务器执行命令
 func (s *ServerConn) RunCmd(cmd string) (string, error) {
-
     conn, err := s.getSshConnect()
     if err != nil {
         return "", err
@@ -118,7 +119,55 @@ func (s *ServerConn) RunCmd(cmd string) (string, error) {
     }
 
     return buf.String(), nil
+}
 
+// 以管道模式在远程服务器执行命令
+// 将命令的输出写到 ch 中
+func (s *ServerConn) RunCmdPipe(cmd string, ch chan <- string) error {
+    conn, err := s.getSshConnect()
+    if err != nil {
+        return err
+    }
+    session, err := conn.NewSession()
+    if err != nil {
+        return err
+    }
+    defer session.Close()
+
+    stdout, err := session.StdoutPipe()
+    if err != nil {
+        return err
+    }
+    stderr, err := session.StderrPipe()
+    if err != nil {
+        return err
+    }
+    err = session.Start(cmd)
+    if err != nil {
+        return err
+    }
+
+    var wg sync.WaitGroup
+    for _, v := range []io.Reader{stdout, stderr} {
+        wg.Add(1)
+        go func(r io.Reader, ch chan <-string) {
+            defer wg.Done()
+            br := bufio.NewReader(r)
+            for {
+                // 当session关闭或执行完成时会收到EOF退出
+                line, _, err := br.ReadLine()
+                if err != nil {
+                    break
+                }
+                ch <- string(line)
+            }
+        }(v, ch)
+    }
+
+    err = session.Wait()
+    wg.Wait()
+    close(ch)
+    return err
 }
 
 // 拷贝本机文件到远程服务器

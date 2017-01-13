@@ -11,6 +11,7 @@ import (
     "time"
     "path/filepath"
     "os"
+    "bytes"
 )
 
 /**
@@ -212,9 +213,17 @@ func (s *DeployTask) syncToServer() (string, error) {
     s.WriteLog("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
     // 执行发布脚本
     scriptFile := filepath.Join(agentTaskDir, filepath.Base(s.task.ScriptPath))
-    result, err := server.RunCmd("/bin/bash " + scriptFile)
-    s.WriteLog("执行发布脚本: ", scriptFile, ", 结果: ", result, ", 错误: ", err)
-    return result, err
+    var result bytes.Buffer
+    out := make(chan string)
+    go func() {
+        for line := range out {
+            result.WriteString(line)
+            s.WriteLog("> " + line)
+        }
+    }()
+    s.WriteLog("在跳板机执行发布脚本: ", scriptFile)
+    err = server.RunCmdPipe("/bin/bash " + scriptFile, out)
+    return result.String(), err
 }
 
 func (s *DeployTask) WriteLog(v ...interface{}) error {
