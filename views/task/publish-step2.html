@@ -94,6 +94,8 @@ function get_status(id) {
 			$('#pub-log > pre').html(out.msg);
 		} else if (out.status >= 0 && out.status < 3) {
 			setTimeout("get_status("+id+")", 1000);
+            $('#pub-log').removeClass('hide');
+            $('#pub-log > pre').html(out.msg);
 		} else if (out.status == 3) {
 			window.location.reload();
 		}

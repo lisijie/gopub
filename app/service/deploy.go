@@ -12,6 +12,7 @@ import (
     "path/filepath"
     "os"
     "bytes"
+    "sync"
 )
 
 /**
@@ -35,62 +36,108 @@ import (
  *
  *
  */
+
+type deployService struct {
+    runningTasks map[int]*DeployTask
+    lock         sync.Mutex
+}
+
+func (m *deployService) DeployTask(taskId int) error {
+    if m.IsRunning(taskId) {
+        return fmt.Errorf("正在发布中")
+    }
+    m.lock.Lock()
+    defer m.lock.Unlock()
+    task, err := TaskService.GetTask(taskId)
+    if err != nil {
+        return err
+    }
+    dt := NewDeployTask(task)
+    m.runningTasks[task.Id] = dt
+    go func() {
+        dt.Deploy()
+        delete(m.runningTasks, task.Id)
+    }()
+    return nil
+}
+
+func (m *deployService) IsRunning(taskId int) bool {
+    m.lock.Lock()
+    defer m.lock.Unlock()
+    _, ok := m.runningTasks[taskId]
+    return ok
+}
+
+// 中断发布
+func (m *deployService) Abort(taskId int) error {
+    m.lock.Lock()
+    defer m.lock.Unlock()
+    if v, ok := m.runningTasks[taskId]; ok {
+        return v.Abort()
+    }
+    return fmt.Errorf("任务未发布或已发布完成")
+}
+
+func (m *deployService) GetMessage(taskId int) (string, error) {
+    if !m.IsRunning(taskId) {
+        task, err := TaskService.GetTask(taskId)
+        if err != nil {
+            return "", err
+        }
+        return task.PubLog, nil
+    }
+    return m.runningTasks[taskId].Message(), nil
+}
+
 type DeployTask struct {
-    task *entity.Task
+    task    *entity.Task
+    logFile string
+    message bytes.Buffer
 }
 
 func NewDeployTask(task *entity.Task) *DeployTask {
-    return &DeployTask{task:task}
+    return &DeployTask{task:task, logFile:Setting.GetTaskPath(task.Id) + "/deploy.log"}
+}
+
+// 中断部署
+func (s *DeployTask) Abort() error {
+    return nil
+}
+
+func (s *DeployTask) Message() string {
+    return s.message.String()
 }
 
 // 执行部署任务
-func (s *DeployTask) Deploy() error {
-    if s.task.PubStatus > 0 {
-        return fmt.Errorf("正在发布或已发布")
-    }
-
+func (s *DeployTask) Deploy() {
+    trace("开始执行部署任务, ID:", s.task.Id)
     s.task.PubStatus = 1
     s.task.ErrorMsg = ""
     TaskService.UpdateTask(s.task, "PubStatus", "ErrorMsg")
 
-    go s.doDeploy()
-
-    return nil
-}
-
-func (s *DeployTask) doDeploy() {
-    trace("开始执行部署任务, ID:", s.task.Id)
-
     // 1. 发布到跳板机
-    s.WriteLog("开始上传更新包到中转服务器...")
+    s.writeLog("开始上传更新包到中转服务器...")
     err := s.syncToAgent()
     if err != nil {
-        s.WriteLog(err)
+        s.writeLog(err)
         s.task.ErrorMsg = fmt.Sprintf("发布到跳板机失败：%v", err)
         s.task.PubStatus = -2
-        TaskService.UpdateTask(s.task, "PubStatus", "ErrorMsg")
-        //s.recordLog("task.publish", fmt.Sprintf("发布到跳板机失败：%v", err))
+        TaskService.UpdateTask(s.task, "PubStatus", "ErrorMsg", "PubLog")
         return
     }
 
     // 2. 发布到目标服务器
     s.task.ErrorMsg = ""
     s.task.PubStatus = 2
-    s.WriteLog("登录中转服务器执行发布脚本...")
-    ret, err := s.syncToServer()
+    s.writeLog("登录中转服务器执行发布脚本...")
+    err = s.syncToServer()
     if err != nil {
-        s.WriteLog(err)
+        s.writeLog(err)
         s.task.PubStatus = -3
         s.task.ErrorMsg = err.Error()
-        TaskService.UpdateTask(s.task, "PubStatus", "ErrorMsg")
-        //s.recordLog("task.publish", fmt.Sprintf("发布到服务器失败：%v", err))
+        TaskService.UpdateTask(s.task, "PubStatus", "ErrorMsg", "PubLog")
         return
     }
-    s.task.PubTime = time.Now()
-    s.task.PubLog = ret
-    s.task.PubStatus = 3
-    s.task.ErrorMsg = ""
-    TaskService.UpdateTask(s.task, "PubTime", "PubLog", "PubStatus", "ErrorMsg")
 
     // 更新项目的最后发步版本
     project, _ := ProjectService.GetProject(s.task.ProjectId)
@@ -101,7 +148,7 @@ func (s *DeployTask) doDeploy() {
     // 3. 发送邮件
     env, _ := EnvService.GetEnv(s.task.PubEnvId)
     if env.SendMail > 0 {
-        s.WriteLog("发送邮件通知相关人员...")
+        s.writeLog("发送邮件通知相关人员...")
         mailTpl, err := MailService.GetMailTpl(env.MailTplId)
         if err == nil {
             replace := make(map[string]string)
@@ -130,12 +177,16 @@ func (s *DeployTask) doDeploy() {
             mailCc := strings.Split(mailTpl.MailCc + "\n" + env.MailCc, "\n")
             if err := MailService.SendMail(subject, content, mailTo, mailCc); err != nil {
                 beego.Error("邮件发送失败：", err)
-                s.WriteLog(err)
+                s.writeLog(err)
             }
         }
     }
 
-    s.WriteLog("部署完成.")
+    s.writeLog("部署完成.")
+    s.task.PubTime = time.Now()
+    s.task.PubStatus = 3
+    s.task.ErrorMsg = ""
+    TaskService.UpdateTask(s.task, "PubTime", "PubLog", "PubStatus", "ErrorMsg")
 }
 
 // 发布到中转服务器
@@ -166,13 +217,13 @@ func (s *DeployTask) syncToAgent() error {
         Key:agentServer.SshKey,
     })
     defer server.Close()
-    s.WriteLog("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
+    s.writeLog("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser)
 
     // 上传更新包
     srcFile = s.task.FilePath
     dstFile = filepath.Join(agentTaskDir, filepath.Base(s.task.FilePath))
     err = server.CopyFile(srcFile, dstFile)
-    s.WriteLog("上传更新包: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
+    s.writeLog("上传更新包: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
     if err != nil {
         return err
     }
@@ -181,7 +232,7 @@ func (s *DeployTask) syncToAgent() error {
     srcFile = s.task.ScriptPath
     dstFile = filepath.Join(agentTaskDir, filepath.Base(srcFile))
     err = server.CopyFile(srcFile, dstFile)
-    s.WriteLog("上传更新脚本: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
+    s.writeLog("上传更新脚本: ", srcFile, " ==> ", dstFile, ", 错误: ", err)
     if err != nil {
         return err
     }
@@ -191,14 +242,14 @@ func (s *DeployTask) syncToAgent() error {
 
 // 发布到线上服务器
 // 登录到中转服务器上执行发布脚本
-func (s *DeployTask) syncToServer() (string, error) {
+func (s *DeployTask) syncToServer() error {
     projectInfo, err := ProjectService.GetProject(s.task.ProjectId)
     if err != nil {
-        return "", err
+        return err
     }
     agentServer, err := ServerService.GetServer(projectInfo.AgentId)
     if err != nil {
-        return "", err
+        return err
     }
     agentTaskDir := fmt.Sprintf("%s/%s/tasks/task-%d", agentServer.WorkDir, projectInfo.Domain, s.task.Id)
     // 连接到跳板机
@@ -210,31 +261,31 @@ func (s *DeployTask) syncToServer() (string, error) {
         Key:agentServer.SshKey,
     })
     defer server.Close()
-    s.WriteLog("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
+    s.writeLog("连接跳板机: ", addr, ", 用户: ", agentServer.SshUser, ", Key: ", agentServer.SshKey)
     // 执行发布脚本
     scriptFile := filepath.Join(agentTaskDir, filepath.Base(s.task.ScriptPath))
-    var result bytes.Buffer
     out := make(chan string)
     go func() {
         for line := range out {
-            result.WriteString(line)
-            s.WriteLog("> " + line)
+            s.writeLog("> " + line)
         }
     }()
-    s.WriteLog("在跳板机执行发布脚本: ", scriptFile)
+    s.writeLog("在跳板机执行发布脚本: ", scriptFile)
     err = server.RunCmdPipe("/bin/bash " + scriptFile, out)
-    return result.String(), err
+    return err
 }
 
-func (s *DeployTask) WriteLog(v ...interface{}) error {
-    logFile := Setting.GetTaskPath(s.task.Id) + "/deploy.log"
-    f, err := os.OpenFile(logFile, os.O_CREATE | os.O_RDWR | os.O_APPEND, 0666)
+func (s *DeployTask) writeLog(v ...interface{}) error {
+    f, err := os.OpenFile(s.logFile, os.O_CREATE | os.O_RDWR | os.O_APPEND, 0666)
     if err != nil {
         return err
     }
     defer f.Close()
-    fmt.Fprint(f, time.Now().Format("2006-01-02 15:04:05") + " ")
+    ts := time.Now().Format("2006-01-02 15:04:05") + " "
+    fmt.Fprint(f, ts)
     fmt.Fprintln(f, v...)
+    s.message.WriteString(ts + fmt.Sprint(v...) + "\n")
+    s.task.PubLog = s.message.String()
     trace(v...)
     return nil
 }

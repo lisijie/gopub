@@ -14,17 +14,18 @@ import (
 var (
     o orm.Ormer
     tablePrefix string                    // 表前缀
-    UserService       *userService       // 用户服务
-    RoleService       *roleService       // 角色服务
-    EnvService        *envService        // 发布环境服务
-    ServerService     *serverService     // 服务器服务
-    ProjectService    *projectService    // 项目服务
-    MailService       *mailService       // 邮件服务
-    TaskService       *taskService       // 任务服务
-    SystemService     *systemService
-    ActionService     *actionService     // 系统动态
-    BuildService      *buildService      // 构建服务
-    Setting           *setting           // 系统设置
+    UserService = &userService{}       // 用户服务
+    RoleService = &roleService{}       // 角色服务
+    EnvService = &envService{}        // 发布环境服务
+    ServerService = &serverService{}     // 服务器服务
+    ProjectService = &projectService{}    // 项目服务
+    MailService = &mailService{}       // 邮件服务
+    TaskService = &taskService{} // 任务服务
+    DeployService = &deployService{runningTasks: make(map[int]*DeployTask)} // 部署
+    SystemService = &systemService{}
+    ActionService = &actionService{}     // 系统动态
+    BuildService = &buildService{}      // 构建服务
+    Setting = &setting{}           // 系统设置
 )
 
 type setting struct {
@@ -83,25 +84,9 @@ func Init() {
 
     // 初始化配置
     initSetting()
-    // 初始化服务对象
-    initService()
-}
-
-func initService() {
-    UserService = &userService{}
-    RoleService = &roleService{}
-    EnvService = &envService{}
-    ServerService = &serverService{}
-    ProjectService = &projectService{}
-    MailService = &mailService{}
-    TaskService = &taskService{}
-    SystemService = &systemService{}
-    ActionService = &actionService{}
-    BuildService = &buildService{}
 }
 
 func initSetting() {
-    Setting = &setting{}
     Setting.DataPath = beego.AppConfig.String("data_dir")
     if Setting.DataPath == "" {
         p, _ := filepath.Abs(filepath.Dir(os.Args[0]))

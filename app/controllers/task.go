@@ -161,13 +161,9 @@ func (c *TaskController) GetStatus() {
     out := make(map[string]interface{})
     switch tp {
     case "pub":
+        msg, _ := service.DeployService.GetMessage(taskId)
         out["status"] = task.PubStatus
-        if task.PubStatus < 0 {
-            out["msg"] = task.ErrorMsg
-        } else {
-            out["msg"] = task.PubLog
-        }
-
+        out["msg"] = msg
     default:
         out["status"] = task.BuildStatus
         out["msg"] = task.ErrorMsg
@@ -221,10 +217,7 @@ func (c *TaskController) StartPub() {
     if !c.auth.HasAccessPerm(c.controllerName, "publish") {
         c.showMsg("您没有执行该操作的权限", MSG_ERR)
     }
-    task, err := service.TaskService.GetTask(taskId)
-    c.checkError(err)
-    dt := service.NewDeployTask(task)
-    err = dt.Deploy()
+    err := service.DeployService.DeployTask(taskId)
     c.checkError(err)
 
     service.ActionService.Add("pub_task", c.auth.GetUserName(), "task", taskId, "")
@@ -248,3 +241,4 @@ func (c *TaskController) Del() {
         c.redirect(beego.URLFor("TaskController.List"))
     }
 }
+
