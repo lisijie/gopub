@@ -82,7 +82,7 @@ CREATE TABLE `t_project` (
 
 CREATE TABLE `t_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(20) NOT NULL DEFAULT '',
+  `name` varchar(20) NOT NULL DEFAULT '',
   `project_ids` varchar(1000) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
   `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
