@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
-	"github.com/lisijie/gopub/app/libs"
-	"github.com/lisijie/gopub/app/service"
+	"../libs"
+	"../service"
 	"regexp"
 	"strconv"
 )

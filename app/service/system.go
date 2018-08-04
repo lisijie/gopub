@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/lisijie/gopub/app/entity"
+	"../entity"
 )
 
 type systemService struct{}

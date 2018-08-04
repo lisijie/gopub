@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
+	"../entity"
+	"../libs"
 	"os"
 	"path/filepath"
 	"strings"
