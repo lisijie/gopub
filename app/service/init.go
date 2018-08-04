@@ -5,7 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/lisijie/gopub/app/entity"
+	"../entity"
 	"net/url"
 	"os"
 )

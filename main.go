@@ -1,12 +1,12 @@
 package main
 
 import (
+	"./app/controllers"
+	_ "./app/mail"
+	"./app/service"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/beego/i18n"
-	"github.com/lisijie/gopub/app/controllers"
-	_ "github.com/lisijie/gopub/app/mail"
-	"github.com/lisijie/gopub/app/service"
 	"time"
 )
 

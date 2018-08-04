@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/beego/i18n"
-	"github.com/lisijie/gopub/app/service"
+	"../service"
 	"io/ioutil"
 	"strings"
 )
