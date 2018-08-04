@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `t_action`;
 CREATE TABLE `t_action` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `action` varchar(20) NOT NULL DEFAULT '',
@@ -10,6 +11,7 @@ CREATE TABLE `t_action` (
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_env`;
 CREATE TABLE `t_env` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL DEFAULT '0',
@@ -25,12 +27,13 @@ CREATE TABLE `t_env` (
   `mail_tpl_id` int(11) NOT NULL DEFAULT '0',
   `mail_to` varchar(1000) NOT NULL DEFAULT '',
   `mail_cc` varchar(1000) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `t_env_project_id` (`project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_env_server`;
 CREATE TABLE `t_env_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL DEFAULT '0',
@@ -40,6 +43,7 @@ CREATE TABLE `t_env_server` (
   KEY `t_env_server_env_id` (`env_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_mail_tpl`;
 CREATE TABLE `t_mail_tpl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -48,23 +52,25 @@ CREATE TABLE `t_mail_tpl` (
   `content` longtext NOT NULL,
   `mail_to` varchar(1000) NOT NULL DEFAULT '',
   `mail_cc` varchar(1000) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_perm`;
 CREATE TABLE `t_perm` (
   `module` varchar(20) NOT NULL DEFAULT '' COMMENT '模块名',
   `action` varchar(20) NOT NULL DEFAULT '' COMMENT '操作名',
   UNIQUE KEY `module` (`module`,`action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_project`;
 CREATE TABLE `t_project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   `domain` varchar(100) NOT NULL DEFAULT '',
   `version` varchar(20) NOT NULL DEFAULT '',
-  `version_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `version_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `repo_url` varchar(100) NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
   `error_msg` longtext NOT NULL,
@@ -75,27 +81,30 @@ CREATE TABLE `t_project` (
   `create_verfile` int(11) NOT NULL DEFAULT '0',
   `verfile_path` varchar(50) NOT NULL DEFAULT '',
   `task_review` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发布是否需要审批',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE `t_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(20) NOT NULL DEFAULT '',
   `project_ids` varchar(1000) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_role_perm`;
 CREATE TABLE `t_role_perm` (
   `role_id` int(11) unsigned NOT NULL,
   `perm` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`role_id`,`perm`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_server`;
 CREATE TABLE `t_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type_id` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:普通服务器, 1:跳板机',
@@ -107,11 +116,12 @@ CREATE TABLE `t_server` (
   `ssh_pwd` varchar(100) NOT NULL DEFAULT '' COMMENT 'ssh密码',
   `ssh_key` varchar(100) NOT NULL DEFAULT '' COMMENT 'sshkey路径',
   `work_dir` varchar(100) NOT NULL DEFAULT '' COMMENT '工作目录',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_task`;
 CREATE TABLE `t_task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL DEFAULT '0' COMMENT '项目ID',
@@ -130,7 +140,7 @@ CREATE TABLE `t_task` (
   `pub_log` longtext NOT NULL COMMENT '发布日志',
   `pub_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发布状态',
   `review_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '审批状态',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `t_task_project_id` (`project_id`),
@@ -138,6 +148,7 @@ CREATE TABLE `t_task` (
   KEY `pub_time` (`pub_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_task_review`;
 CREATE TABLE `t_task_review` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `task_id` int(11) NOT NULL COMMENT '任务ID',
@@ -150,6 +161,7 @@ CREATE TABLE `t_task_review` (
   KEY `task_id` (`task_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(20) NOT NULL DEFAULT '',
@@ -160,12 +172,13 @@ CREATE TABLE `t_user` (
   `last_login` datetime DEFAULT NULL,
   `last_ip` varchar(15) NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
-  `create_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `t_user_role`;
 CREATE TABLE `t_user_role` (
   `user_id` int(11) unsigned NOT NULL,
   `role_id` int(11) unsigned NOT NULL,
@@ -275,4 +288,4 @@ VALUES
 
 INSERT INTO `t_user` (`id`, `user_name`, `password`, `salt`, `sex`, `email`, `last_login`, `last_ip`, `status`, `create_time`, `update_time`)
 VALUES
-	(1,'admin','7fef6171469e80d32c0559f88b377245','',1,'admin@admin.com','2016-05-11 10:33:49','127.0.0.1',0,'0000-00-00 00:00:00','2016-05-11 10:33:49');
+	(1,'admin','7fef6171469e80d32c0559f88b377245','',1,'admin@admin.com','2016-05-11 10:33:49','127.0.0.1',0,NOW(),'2016-05-11 10:33:49');
