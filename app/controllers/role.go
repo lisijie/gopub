@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/service"
+	"../entity"
+	"../service"
 	"strings"
 )
 

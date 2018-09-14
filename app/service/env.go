@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/astaxie/beego/orm"
-	"github.com/lisijie/gopub/app/entity"
+	"../entity"
 )
 
 type envService struct{}

@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"../service"
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"github.com/beego/i18n"
-	"github.com/lisijie/gopub/app/service"
 	"io/ioutil"
 	"strings"
 )
@@ -185,7 +186,7 @@ func (this *BaseController) jsonResult(out interface{}) {
 
 // 错误检查
 func (this *BaseController) checkError(err error) {
-	if err != nil {
+	if err != nil && err != orm.ErrNoRows {
 		this.showMsg(err.Error(), MSG_ERR)
 	}
 }
