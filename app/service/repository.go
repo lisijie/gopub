@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/lisijie/gopub/app/libs"
+	"../libs"
 	"path/filepath"
 	"sort"
 	"strconv"

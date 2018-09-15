@@ -3,8 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/service"
+	"../entity"
+	"../service"
 	"strconv"
 )
 

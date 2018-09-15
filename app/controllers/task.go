@@ -3,9 +3,9 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
-	"github.com/lisijie/gopub/app/service"
+	"../entity"
+	"../libs"
+	"../service"
 )
 
 type TaskController struct {

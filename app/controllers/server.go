@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
-	"github.com/lisijie/gopub/app/entity"
-	"github.com/lisijie/gopub/app/libs"
-	"github.com/lisijie/gopub/app/service"
+	"../entity"
+	"../libs"
+	"../service"
 	"strconv"
 )
 
@@ -20,9 +21,13 @@ func (this *ServerController) List() {
 		page = 1
 	}
 	count, err := service.ServerService.GetTotal(service.SERVER_TYPE_NORMAL)
-	this.checkError(err)
+	if err != orm.ErrNoRows {
+		this.checkError(err)
+	}
 	serverList, err := service.ServerService.GetServerList(page, this.pageSize)
-	this.checkError(err)
+	if err != orm.ErrNoRows {
+		this.checkError(err)
+	}
 
 	this.Data["count"] = count
 	this.Data["list"] = serverList
